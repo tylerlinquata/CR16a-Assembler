@@ -7,13 +7,31 @@
 //
 
 #include <iostream>
+#include <boost/tokenizer.hpp>
+#include <string>
+
+using namespace std;
+using namespace boost;
+
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+    string instruction;
     
-    // TODO recieve instructions from commandline (for now)
-    // TODO recieve instructions from .asm file
+    string s = "This is,  a test";
+
+    while(instruction.compare("exit") != 0) {
+        cout << "Enter a CR16 instruction: ";
+        getline(cin, instruction);
+        tokenizer<> tok(instruction);
+        for(tokenizer<>::iterator beg=tok.begin(); beg!=tok.end(); ++beg){
+            cout << *beg << "\n";
+        }
+        
+    }
+
+    
+//     TODO recieve instructions from commandline (for now)
+//     TODO recieve instructions from .asm file
 //     TODO tokenize
 //     TODO convert to binary
     
