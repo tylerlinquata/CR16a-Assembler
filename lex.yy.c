@@ -374,7 +374,7 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[29] =
     {   0,
-        0,    0,   11,   10,    1,    9,    8,    6,    7,    7,
+        0,    0,   11,   10,    1,    8,    9,    6,    7,    7,
         7,    7,    0,    6,    7,    7,    7,    7,    5,    4,
         7,    7,    7,    3,    7,    7,    2,    0
     } ;
@@ -476,7 +476,7 @@ char *yytext;
 
 	using namespace std;
 	extern int yylex();
-	int linenum;
+	int lineNum = 1;
 #line 481 "lex.yy.c"
 
 #define INITIAL 0
@@ -767,43 +767,35 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 15 "assembler.l"
-{ yylval.fval = atof(yytext); return FLOAT; }
+{ yylval.fval = atof(yytext); 	return FLOAT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 16 "assembler.l"
-{ yylval.ival = atoi(yytext); return INT; }
+{ yylval.ival = atoi(yytext); 	return INT; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 17 "assembler.l"
-{
-  // We have to strdup yytext because Flex will change it for the next token.
-  // Note that this memory must be freed somewhere, so that's why we call
-  // free() above in the Bison section.  (Aside: we use free() instead of
-  // delete because strdup is a C function that uses malloc, not a C++
-  // function that uses new.)
-  yylval.sval = strdup(yytext);
-  return STRING;
-}
+{ yylval.sval = strdup(yytext); return STRING; }
 	YY_BREAK
 case 8:
+/* rule 8 can match eol */
 YY_RULE_SETUP
-#line 26 "assembler.l"
-;
+#line 18 "assembler.l"
+{ ++lineNum; return ENDL; }
 	YY_BREAK
 case 9:
-/* rule 9 can match eol */
 YY_RULE_SETUP
-#line 27 "assembler.l"
-{ cout << ++linenum << endl; }
+#line 19 "assembler.l"
+;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 28 "assembler.l"
+#line 20 "assembler.l"
 ECHO;
 	YY_BREAK
-#line 807 "lex.yy.c"
+#line 799 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1800,7 +1792,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 28 "assembler.l"
+#line 20 "assembler.l"
 
 
 

@@ -42,32 +42,34 @@
      SNAZZLE = 258,
      TYPE = 259,
      END = 260,
-     INT = 261,
-     FLOAT = 262,
-     STRING = 263
+     ENDL = 261,
+     INT = 262,
+     FLOAT = 263,
+     STRING = 264
    };
 #endif
 /* Tokens.  */
 #define SNAZZLE 258
 #define TYPE 259
 #define END 260
-#define INT 261
-#define FLOAT 262
-#define STRING 263
+#define ENDL 261
+#define INT 262
+#define FLOAT 263
+#define STRING 264
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 22 "assembler.y"
+#line 23 "assembler.y"
 {
   int ival;
   float fval;
   char *sval;
 }
 /* Line 1529 of yacc.c.  */
-#line 71 "assembler.tab.h"
+#line 73 "assembler.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
