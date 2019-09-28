@@ -39,23 +39,23 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     SNAZZLE = 258,
+     CODEDUMPSTER = 258,
      TYPE = 259,
      END = 260,
      ENDL = 261,
      INT = 262,
      FLOAT = 263,
-     STRING = 264
+     INSTR = 264
    };
 #endif
 /* Tokens.  */
-#define SNAZZLE 258
+#define CODEDUMPSTER 258
 #define TYPE 259
 #define END 260
 #define ENDL 261
 #define INT 262
 #define FLOAT 263
-#define STRING 264
+#define INSTR 264
 
 
 
