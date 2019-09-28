@@ -24,6 +24,7 @@
   int ival;
   float fval;
   char *sval;
+  char *regval;
 }
 
 // define the constant string tokens:
@@ -35,6 +36,7 @@
 %token <ival> INT
 %token <fval> FLOAT
 %token <sval> INSTR
+%token <regval> REG
 
 %%
 
@@ -54,13 +56,21 @@ body_section:
   assembly_lines
   ;
 assembly_lines:
-  assembly_lines assembly_line
-  | assembly_line
+  assembly_lines reg_type_line | assembly_lines assembly_line
+  | assembly_line | reg_type_line
   ;
 assembly_line:
   INSTR ENDLS {
       cout << "instruction: " << $1 << endl;
       free($1);
+    }
+  ;
+reg_type_line:
+    INSTR REG REG ENDLS {
+      cout << "R-type op: " << $1 << " reg_1: " << $2 << " reg_2: " << $3 << endl;
+      free($1);
+      free($2);
+      free($3);
     }
   ;
 footer:

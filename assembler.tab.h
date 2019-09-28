@@ -45,7 +45,8 @@
      ENDL = 261,
      INT = 262,
      FLOAT = 263,
-     INSTR = 264
+     INSTR = 264,
+     REG = 265
    };
 #endif
 /* Tokens.  */
@@ -56,6 +57,7 @@
 #define INT 262
 #define FLOAT 263
 #define INSTR 264
+#define REG 265
 
 
 
@@ -67,9 +69,10 @@ typedef union YYSTYPE
   int ival;
   float fval;
   char *sval;
+  char *regval;
 }
 /* Line 1529 of yacc.c.  */
-#line 73 "assembler.tab.h"
+#line 76 "assembler.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
