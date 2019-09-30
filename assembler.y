@@ -25,6 +25,7 @@
   float fval;
   char *sval;
   char *regval;
+  char *immval;
 }
 
 // define the constant string tokens:
@@ -37,7 +38,7 @@
 %token <fval> FLOAT
 %token <sval> INSTR
 %token <regval> REG
-
+%token <immval> IMM;
 %%
 
 // the first rule defined is the highest-level rule, which in our
@@ -57,7 +58,8 @@ body_section:
   ;
 assembly_lines:
   assembly_lines reg_type_line | assembly_lines assembly_line
-  | assembly_line | reg_type_line
+  | assembly_lines imm_type_line | assembly_lines single_reg_line | assembly_line | reg_type_line |
+  imm_type_line | single_reg_line
   ;
 assembly_line:
   INSTR ENDLS {
@@ -65,11 +67,25 @@ assembly_line:
       free($1);
     }
   ;
+single_reg_line:
+    INSTR REG ENDLS {
+        cout << "instruction: " << $1 << " reg: " << $2 << endl;
+        free($1);
+        free($2);
+    }
+  ;
 reg_type_line:
     INSTR REG REG ENDLS {
       cout << "R-type op: " << $1 << " reg_1: " << $2 << " reg_2: " << $3 << endl;
       free($1);
       free($2);
+      free($3);
+    }
+  ;
+imm_type_line:
+    INSTR REG IMM ENDLS {
+      cout << "I-Type op: " << $1 << " reg: " << $2 << " imm: " << $3 << endl;
+      free($1);
       free($3);
     }
   ;
