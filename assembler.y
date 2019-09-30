@@ -58,8 +58,9 @@ body_section:
   ;
 assembly_lines:
   assembly_lines reg_type_line | assembly_lines assembly_line
-  | assembly_lines imm_type_line | assembly_lines single_reg_line | assembly_line | reg_type_line |
-  imm_type_line | single_reg_line
+  | assembly_lines imm_type_line | assembly_lines single_reg_line |
+  assembly_lines imm_first_line | assembly_line | reg_type_line |
+  imm_type_line | single_reg_line | imm_first_line
   ;
 assembly_line:
   INSTR ENDLS {
@@ -86,6 +87,15 @@ imm_type_line:
     INSTR REG IMM ENDLS {
       cout << "I-Type op: " << $1 << " reg: " << $2 << " imm: " << $3 << endl;
       free($1);
+      free($2);
+      free($3);
+    }
+  ;
+imm_first_line:
+    INSTR IMM REG ENDLS {
+      cout << "I-type op: " << $1 << " imm: " << $2 << " reg: " << $3 << endl;
+      free($1);
+      free($2);
       free($3);
     }
   ;
