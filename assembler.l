@@ -17,6 +17,7 @@ end            	{ return END; }
 [0-9]+\.[0-9]+  { yylval.fval = atof(yytext); 	return FLOAT; }
 [0-9]+          { yylval.ival = atoi(yytext); 	return INT; }
 [A-Z]{2,4}   		{ yylval.sval = strdup(yytext); return INSTR; }
+[0-9]+[(][R][0-9]+[)] { yylval.relval = strdup(yytext); return REL; }
 \n 							{ ++lineNum; return ENDL; }
 ,								;
 %%

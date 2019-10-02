@@ -26,6 +26,7 @@
   char *sval;
   char *regval;
   char *immval;
+  char *relval;
 }
 
 // define the constant string tokens:
@@ -39,6 +40,7 @@
 %token <sval> INSTR
 %token <regval> REG
 %token <immval> IMM;
+%token <relval> REL;
 %%
 
 // the first rule defined is the highest-level rule, which in our
@@ -57,16 +59,14 @@ body_section:
   assembly_lines
   ;
 assembly_lines:
-  assembly_lines reg_type_line | assembly_lines assembly_line
-  | assembly_lines imm_type_line | assembly_lines single_reg_line |
-  assembly_lines imm_first_line | assembly_line | reg_type_line |
-  imm_type_line | single_reg_line | imm_first_line
-  ;
-assembly_line:
-  INSTR ENDLS {
-      cout << "instruction: " << $1 << endl;
-      free($1);
-    }
+  assembly_lines reg_type_line | assembly_lines imm_type_line
+  | assembly_lines single_reg_line | assembly_lines single_rel_line |
+  assembly_lines rel_reg_line | assembly_lines reg_rel_line |
+  assembly_lines rel_imm_line | assembly_lines imm_rel_line |
+  assembly_lines imm_first_line | reg_type_line |
+  imm_type_line | single_reg_line | imm_first_line |
+  single_reg_line | rel_reg_line | reg_rel_line |
+  rel_imm_line | imm_rel_line
   ;
 single_reg_line:
     INSTR REG ENDLS {
@@ -99,6 +99,46 @@ imm_first_line:
       free($3);
     }
   ;
+single_rel_line:
+    INSTR REL ENDLS {
+      cout << "op: " << $1 << " relative: " << $2 << endl;
+      free($1);
+      free($2);
+    }
+  ;
+rel_reg_line:
+    INSTR REL REG ENDLS {
+      cout << "R-type op: " << $1 << " rel: " << $2 << " reg_1: " << $3 << endl;
+      free($1);
+      free($2);
+      free($3);
+    }
+  ;
+reg_rel_line:
+    INSTR REG REL ENDLS {
+      cout << "R-type op: " << $1 << " reg: " << $2 << " rel: " << $3 << endl;
+      free($1);
+      free($2);
+      free($3);
+    }
+  ;
+rel_imm_line:
+    INSTR REL IMM ENDLS {
+      cout << "I-type op: " << $1 << " rel: " << $2 << " imm: " << $3 << endl;
+      free($1);
+      free($2);
+      free($3);
+    }
+  ;
+imm_rel_line:
+    INSTR IMM REL ENDLS {
+      cout << "I-type op: " << $1 << " imm: " << $2 << " rel: " << $3 << endl;
+      free($1);
+      free($2);
+      free($3);
+    }
+;
+
 footer:
   END ENDLS
   ;

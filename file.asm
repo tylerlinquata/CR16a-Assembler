@@ -1,7 +1,11 @@
 codedumpster 1.0
-ADDL
 ADD R5, R4
 SUB R6, $56
 JMP R5
 ADD $5, R1
+JMP 12(R6)
+ADD R1, 4(R9)
+SUB 8(R10), R15
+ADD 16(R12), $45
+SUB $55, 20(R9)
 end
