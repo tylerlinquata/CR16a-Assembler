@@ -1,6 +1,8 @@
 %{
   #include <cstdio>
   #include <iostream>
+  #include <string.h>
+  #include "instruction.h"
   using namespace std;
 
   // Declare stuff from Flex that Bison needs to know about:
@@ -70,7 +72,9 @@ assembly_lines:
   ;
 single_reg_line:
     INSTR REG ENDLS {
-        cout << "instruction: " << $1 << " reg: " << $2 << endl;
+        Instruction ins;
+        ins.setOpcode($1);
+        cout << ins.opBinary << endl;
         free($1);
         free($2);
     }
@@ -78,6 +82,9 @@ single_reg_line:
 reg_type_line:
     INSTR REG REG ENDLS {
       cout << "R-type op: " << $1 << " reg_1: " << $2 << " reg_2: " << $3 << endl;
+      // make functions that take in the instruction string, reg, relative
+
+
       free($1);
       free($2);
       free($3);
