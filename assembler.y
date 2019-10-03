@@ -72,7 +72,6 @@ assembly_lines:
   ;
 single_reg_line:
     INSTR REG ENDLS {
-       Instruction i = Instruction($1, $2);
         free($1);
         free($2);
     }
