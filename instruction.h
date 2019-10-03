@@ -14,21 +14,25 @@ public:
   void setOpcode(string op) {
     opString = op;
     if(op.compare("ADD")) {
-      opBinary = "0000";
+      opBinary = decimalToBinary(4);
     }
     else {
-      opBinary = "1111";
+      opBinary = decimalToBinary(4);
     }
   }
 };
 
 string decimalToBinary(int decimalValue) {
   string binary = "";
+  int conversionValue = decimalValue;
 
-  while(decimalValue > 0) {
-    binary += decimalValue % 2;
-    decimalValue = decimalValue / 2;
+  while(conversionValue > 0) {
+    binary += to_string(conversionValue % 2);
+    conversionValue = conversionValue / 2;
   }
+
+  // the while loop outputs the binary in the wrong direction
+  reverse(binary.begin(), binary.end());
 
   return binary;
 }
