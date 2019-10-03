@@ -72,17 +72,14 @@ assembly_lines:
   ;
 single_reg_line:
     INSTR REG ENDLS {
-        Instruction i = Instruction($1, $2, "R5");
+       Instruction i = Instruction($1, $2);
         free($1);
         free($2);
     }
   ;
 reg_type_line:
     INSTR REG REG ENDLS {
-      cout << "R-type op: " << $1 << " reg_1: " << $2 << " reg_2: " << $3 << endl;
-      // make functions that take in the instruction string, reg, relative
-
-
+      Instruction i = Instruction($1, $2, $3);
       free($1);
       free($2);
       free($3);

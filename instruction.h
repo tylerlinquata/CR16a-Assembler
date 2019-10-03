@@ -6,16 +6,17 @@ string regToBinary(string reg);
 class Instruction {
 public:
   string instruction;
-  string opBinary;
-  string opString;
-  int Rdest;
-  int Rsrc;
-  int imm;
+
+  Instruction(string op, string reg1) {
+      // TODO
+  }
 
   Instruction(string op, string reg1, string reg2) {
-    if(op.compare("ADD")) {
+    if(op.compare("ADD") == 0) {
       instruction += "0000";
       instruction += regToBinary(reg1);
+      instruction += "0101";
+      instruction += regToBinary(reg2);
       cout << instruction << endl;
     }
   }
@@ -44,4 +45,8 @@ string decimalToBinary(int decimalValue, int length) {
 string regToBinary(string reg) {
   int regVal = stoi(reg.substr(1, reg.size()));
   return decimalToBinary(regVal, 4);
+}
+
+string buildInstruction(string op, string reg1, string reg2) {
+
 }
