@@ -39,19 +39,20 @@ string decimalToBinary(int decimalValue, int length) {
 // converts decimal numbers to sign extended binary numbers of a specfied length
 string decimalToSignExtendedBinary(int decimalValue, int length) {
   string binary = "";
-  int conversionValue = decimalValue;
+  int conversionValue = abs(decimalValue);
 
   // TODO check if int is too big
-
   while(conversionValue > 0) {
     binary += to_string(conversionValue % 2);
     conversionValue = conversionValue / 2;
   }
 
+  cout << binary << endl;
+
   // sign extend the binary number until it reaches desired length
   while(binary.size() < length) {
     if(decimalValue < 0) {
-          binary += "1";
+      binary += "1";
     }
     else {
       binary += "0";
@@ -60,6 +61,7 @@ string decimalToSignExtendedBinary(int decimalValue, int length) {
 
   // the while loop outputs the binary in the wrong direction
   reverse(binary.begin(), binary.end());
+
   return binary;
 }
 
