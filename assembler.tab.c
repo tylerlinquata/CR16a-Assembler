@@ -450,8 +450,8 @@ static const yytype_uint8 yyrline[] =
 {
        0,    51,    51,    56,    61,    64,    64,    65,    65,    66,
       66,    67,    67,    68,    68,    68,    69,    69,    69,    70,
-      70,    73,    79,    87,    96,   103,   111,   119,   127,   136,
-     139,   140
+      70,    73,    79,    88,    97,   104,   112,   120,   128,   137,
+     140,   141
 };
 #endif
 
@@ -1404,6 +1404,7 @@ yyreduce:
   case 22:
 #line 79 "assembler.y"
     {
+      cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rsrc: " << (yyvsp[(3) - (4)].regval) << " Rdst: " << (yyvsp[(2) - (4)].regval) << endl;
       Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].regval));
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].regval));
@@ -1412,9 +1413,9 @@ yyreduce:
     break;
 
   case 23:
-#line 87 "assembler.y"
+#line 88 "assembler.y"
     {
-      cout << "I-Type op: " << (yyvsp[(1) - (4)].sval) << " imm: " << (yyvsp[(2) - (4)].immval) << " reg: " << (yyvsp[(3) - (4)].regval) << endl;
+      cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Imm: " << (yyvsp[(2) - (4)].immval) << endl;
       Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].regval));
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].immval));
@@ -1423,7 +1424,7 @@ yyreduce:
     break;
 
   case 24:
-#line 96 "assembler.y"
+#line 97 "assembler.y"
     {
       cout << "op: " << (yyvsp[(1) - (3)].sval) << " relative: " << (yyvsp[(2) - (3)].relval) << endl;
       free((yyvsp[(1) - (3)].sval));
@@ -1432,7 +1433,7 @@ yyreduce:
     break;
 
   case 25:
-#line 103 "assembler.y"
+#line 104 "assembler.y"
     {
       cout << "R-type op: " << (yyvsp[(1) - (4)].sval) << " rel: " << (yyvsp[(2) - (4)].relval) << " reg_1: " << (yyvsp[(3) - (4)].regval) << endl;
       free((yyvsp[(1) - (4)].sval));
@@ -1442,7 +1443,7 @@ yyreduce:
     break;
 
   case 26:
-#line 111 "assembler.y"
+#line 112 "assembler.y"
     {
       cout << "R-type op: " << (yyvsp[(1) - (4)].sval) << " reg: " << (yyvsp[(2) - (4)].regval) << " rel: " << (yyvsp[(3) - (4)].relval) << endl;
       free((yyvsp[(1) - (4)].sval));
@@ -1452,7 +1453,7 @@ yyreduce:
     break;
 
   case 27:
-#line 119 "assembler.y"
+#line 120 "assembler.y"
     {
       cout << "I-type op: " << (yyvsp[(1) - (4)].sval) << " rel: " << (yyvsp[(2) - (4)].relval) << " imm: " << (yyvsp[(3) - (4)].immval) << endl;
       free((yyvsp[(1) - (4)].sval));
@@ -1462,7 +1463,7 @@ yyreduce:
     break;
 
   case 28:
-#line 127 "assembler.y"
+#line 128 "assembler.y"
     {
       cout << "I-type op: " << (yyvsp[(1) - (4)].sval) << " imm: " << (yyvsp[(2) - (4)].immval) << " rel: " << (yyvsp[(3) - (4)].relval) << endl;
       free((yyvsp[(1) - (4)].sval));
@@ -1473,7 +1474,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1477 "assembler.tab.c"
+#line 1478 "assembler.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1687,7 +1688,7 @@ yyreturn:
 }
 
 
-#line 141 "assembler.y"
+#line 142 "assembler.y"
 
 
 int main(int, char**) {

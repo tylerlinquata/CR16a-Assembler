@@ -2,4 +2,7 @@ codedumpster 1.0
 ADD R5, R6
 ADDI $29, R8
 ADDI $-5, R13
+ADDU R4, R15
+ADDC R0, R11
+MUL R1, R10
 end

@@ -47,8 +47,6 @@ string decimalToSignExtendedBinary(int decimalValue, int length) {
     conversionValue = conversionValue / 2;
   }
 
-  cout << binary << endl;
-
   // sign extend the binary number until it reaches desired length
   while(binary.size() < length) {
     if(decimalValue < 0) {
@@ -76,15 +74,34 @@ string buildInstruction(string op, string val1, string val2) {
   string instruction = "";
   if(op.compare("ADD") == 0) {
     instruction += "0000";
-    instruction += regToBinary(val1);
-    instruction += "0101";
     instruction += regToBinary(val2);
+    instruction += "0101";
+    instruction += regToBinary(val1);
   }
   else if(op.compare("ADDI") == 0) {
     instruction += "0101";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
+  else if(op.compare("ADDU") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "0110";
+    instruction += regToBinary(val1);
+  }
+  else if(op.compare("ADDC") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "0111";
+    instruction += regToBinary(val1);
+  }
+  else if(op.compare("MUL") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "1110";
+    instruction += regToBinary(val1);
+  }
 
+  cout << instruction << endl;
   return instruction;
 }
