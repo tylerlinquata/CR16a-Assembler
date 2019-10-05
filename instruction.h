@@ -148,8 +148,31 @@ string buildInstruction(string op, string val1, string val2) {
   else if(op.compare("ANDI") == 0) {
     instruction += "0001";
     instruction += regToBinary(val2);
-    instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
+    instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
+  else if(op.compare("OR") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "0010";
+    instruction += regToBinary(val1);
+  }
+  else if(op.compare("ORI") == 0) {
+    instruction += "0010";
+    instruction += regToBinary(val2);
+    instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
+  else if(op.compare("XOR") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "0011";
+    instruction += regToBinary(val1);
+  }
+  else if(op.compare("XORI") == 0) {
+    instruction += "0011";
+    instruction += regToBinary(val2);
+    instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
+  // TODO all instructions past LSH
 
   cout << instruction << endl;
   return instruction;
