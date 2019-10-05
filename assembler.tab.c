@@ -1404,7 +1404,7 @@ yyreduce:
   case 22:
 #line 79 "assembler.y"
     {
-      cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rsrc: " << (yyvsp[(3) - (4)].regval) << " Rdst: " << (yyvsp[(2) - (4)].regval) << endl;
+      cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Rsrc: " << (yyvsp[(2) - (4)].regval) << endl;
       Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].regval));
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].regval));

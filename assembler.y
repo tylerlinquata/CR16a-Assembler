@@ -77,7 +77,7 @@ single_reg_line:
   ;
 reg_type_line:
     INSTR REG REG ENDLS {
-      cout << "op: " << $1 << " Rsrc: " << $3 << " Rdst: " << $2 << endl;
+      cout << "op: " << $1 << " Rdst: " << $3 << " Rsrc: " << $2 << endl;
       Instruction i = Instruction($1, $2, $3);
       free($1);
       free($2);

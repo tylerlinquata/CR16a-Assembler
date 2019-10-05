@@ -101,6 +101,55 @@ string buildInstruction(string op, string val1, string val2) {
     instruction += "1110";
     instruction += regToBinary(val1);
   }
+  else if(op.compare("MULI") == 0) {
+    instruction += "1110";
+    instruction += regToBinary(val2);
+    instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
+  else if(op.compare("SUB") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "1001";
+    instruction += regToBinary(val1);
+  }
+  else if(op.compare("SUBI") == 0) {
+    instruction += "1001";
+    instruction += regToBinary(val2);
+    instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
+  else if(op.compare("SUBC") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "1010";
+    instruction += regToBinary(val1);
+  }
+  else if(op.compare("SUBCI") == 0) {
+    instruction += "1010";
+    instruction += regToBinary(val2);
+    instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
+  else if(op.compare("CMP") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "1011";
+    instruction += regToBinary(val1);
+  }
+  else if(op.compare("CMPI") == 0) {
+    instruction += "1011";
+    instruction += regToBinary(val2);
+    instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
+  else if(op.compare("AND") == 0) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "0001";
+    instruction += regToBinary(val1);
+  }
+  else if(op.compare("ANDI") == 0) {
+    instruction += "0001";
+    instruction += regToBinary(val2);
+    instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
 
   cout << instruction << endl;
   return instruction;
