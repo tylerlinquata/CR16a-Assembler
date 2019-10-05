@@ -33,7 +33,6 @@ string decimalToBinary(int decimalValue, int length) {
 
   // the while loop outputs the binary in the wrong direction
   reverse(binary.begin(), binary.end());
-
   return binary;
 }
 
@@ -61,7 +60,6 @@ string decimalToSignExtendedBinary(int decimalValue, int length) {
 
   // the while loop outputs the binary in the wrong direction
   reverse(binary.begin(), binary.end());
-
   return binary;
 }
 
@@ -71,23 +69,20 @@ string regToBinary(string reg) {
   return decimalToBinary(regVal, 4);
 }
 
-//
-string buildInstruction(string op, string reg1, string reg2) {
+// builds an instruction string
+string buildInstruction(string op, string val1, string val2) {
   string instruction = "";
   if(op.compare("ADD") == 0) {
     instruction += "0000";
-    instruction += regToBinary(reg1);
-
-    // check if the instruction is I type
-    if(reg2[0] == 'R') {
-      instruction += "0101";
-      instruction += regToBinary(reg2);
-    }
-    else if(reg2[0] == '$') {
-      instruction += decimalToSignExtendedBinary(stoi(reg1.substr(1, reg1.size())), 8);
-    }
-
-    cout << instruction << endl;
+    instruction += regToBinary(val1);
+    instruction += "0101";
+    instruction += regToBinary(val2);
   }
+  else if(op.compare("ADDI") == 0) {
+    instruction += "0101";
+    instruction += regToBinary(val2);
+    instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
+
   return instruction;
 }
