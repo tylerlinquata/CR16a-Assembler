@@ -69,6 +69,12 @@ string regToBinary(string reg) {
   return decimalToBinary(regVal, 4);
 }
 
+// convert an integer to its two's complement equivalent
+string convertToTwosComplement(int inputInteger, int length) {
+  int convertedInt = -(unsigned int)inputInteger;
+  return decimalToSignExtendedBinary(convertedInt, length);
+}
+
 // builds an instruction string
 string buildInstruction(string op, string val1, string val2) {
   string instruction = "";
@@ -172,6 +178,19 @@ string buildInstruction(string op, string val1, string val2) {
     instruction += regToBinary(val2);
     instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
+  else if(op.compare("LOAD") == 0) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "0000";
+    instruction += regToBinary(val2);
+  }
+  else if(op.compare("STOR") == 0) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "0100";
+    instruction += regToBinary(val2);
+  }
+
   // TODO all instructions past LSH
 
   cout << instruction << endl;
