@@ -2,6 +2,7 @@
   #include <cstdio>
   #include <iostream>
   #include <string.h>
+  #include <fstream>
   #include "instruction.h"
   using namespace std;
 
@@ -60,15 +61,23 @@ header:
 body_section:
   assembly_lines
   ;
-assembly_lines:
-  assembly_lines reg_type_line | assembly_lines imm_type_line
-  | assembly_lines single_reg_line | assembly_lines single_rel_line |
-  assembly_lines rel_reg_line | assembly_lines reg_rel_line |
-  assembly_lines rel_imm_line | assembly_lines imm_rel_line |
-  reg_type_line | imm_type_line | single_reg_line |
-  single_reg_line | rel_reg_line | reg_rel_line |
-  rel_imm_line | imm_rel_line
-  ;
+assembly_lines  : assembly_lines reg_type_line
+                | assembly_lines imm_type_line
+                | assembly_lines single_reg_line
+                | assembly_lines single_rel_line
+                | assembly_lines rel_reg_line
+                | assembly_lines reg_rel_line
+                | assembly_lines rel_imm_line
+                | assembly_lines imm_rel_line
+                | reg_type_line
+                | imm_type_line
+                | single_reg_line
+                | single_reg_line
+                | rel_reg_line
+                | reg_rel_line
+                | rel_imm_line
+                | imm_rel_line
+                ;
 single_reg_line:
     INSTR REG ENDLS {
         free($1);
@@ -141,9 +150,9 @@ ENDLS:
   | ENDL ;
 %%
 
-int main(int, char**) {
+int main(int argc, char *argv[]) {
   // Open a file handle to a particular file:
-  FILE *myfile = fopen("file.asm", "r");
+  FILE *myfile = fopen(argv[1], "r");
   // Make sure it is valid:
   if (!myfile) {
     cout << "I can't open that file!" << endl;
@@ -154,7 +163,6 @@ int main(int, char**) {
 
   // Parse through the input:
   yyparse();
-
 }
 
 void yyerror(const char *s) {
