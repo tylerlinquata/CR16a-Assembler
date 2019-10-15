@@ -10,7 +10,6 @@
 %%
 [ \t]						;
 codedumpster   	{ return CODEDUMPSTER; }
-type           	{ return TYPE; }
 end            	{ return END; }
 [$][-]?[0-9]+		{ yylval.immval = strdup(yytext); return IMM; }
 [R][0-9]+				{ yylval.regval = strdup(yytext); return REG; }

@@ -78,41 +78,41 @@ string convertToTwosComplement(int inputInteger, int length) {
 // builds an instruction string
 string buildInstruction(string op, string val1, string val2) {
   string instruction = "";
-  if(op.compare("ADD") == 0) {
+  if(op.compare("ADD")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0101";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("ADDI") == 0) {
+  else if(op.compare("ADDI")) {
     instruction += "0101";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("ADDU") == 0) {
+  else if(op.compare("ADDU")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0110";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("ADDC") == 0) {
+  else if(op.compare("ADDC")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0111";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("MUL") == 0) {
+  else if(op.compare("MUL")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "1110";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("MULI") == 0) {
+  else if(op.compare("MULI")) {
     instruction += "1110";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("SUB") == 0) {
+  else if(op.compare("SUB")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "1001";
@@ -123,68 +123,68 @@ string buildInstruction(string op, string val1, string val2) {
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("SUBC") == 0) {
+  else if(op.compare("SUBC")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "1010";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("SUBCI") == 0) {
+  else if(op.compare("SUBCI")) {
     instruction += "1010";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("CMP") == 0) {
+  else if(op.compare("CMP")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "1011";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("CMPI") == 0) {
+  else if(op.compare("CMPI")) {
     instruction += "1011";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("AND") == 0) {
+  else if(op.compare("AND")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0001";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("ANDI") == 0) {
+  else if(op.compare("ANDI")) {
     instruction += "0001";
     instruction += regToBinary(val2);
     instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("OR") == 0) {
+  else if(op.compare("OR")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0010";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("ORI") == 0) {
+  else if(op.compare("ORI")) {
     instruction += "0010";
     instruction += regToBinary(val2);
     instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("XOR") == 0) {
+  else if(op.compare("XOR")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0011";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("XORI") == 0) {
+  else if(op.compare("XORI")) {
     instruction += "0011";
     instruction += regToBinary(val2);
     instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("LOAD") == 0) {
+  else if(op.compare("LOAD")) {
     instruction += "0100";
     instruction += regToBinary(val1);
     instruction += "0000";
     instruction += regToBinary(val2);
   }
-  else if(op.compare("STOR") == 0) {
+  else if(op.compare("STOR")) {
     instruction += "0100";
     instruction += regToBinary(val1);
     instruction += "0100";
