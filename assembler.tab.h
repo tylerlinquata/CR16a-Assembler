@@ -68,7 +68,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 26 "assembler.y"
+#line 27 "assembler.y"
 {
   int ival;
   float fval;

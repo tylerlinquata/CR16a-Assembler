@@ -10,6 +10,7 @@
   extern int yylex();
   extern int yyparse();
   extern FILE *yyin;
+  extern FILE *yyout;
   extern int lineNum;
 
   void yyerror(const char *s);
@@ -51,12 +52,12 @@
 assembler:
   header body_section footer {
       cout << "done with an asm file!" << endl;
-    }
+  }
   ;
 header:
   CODEDUMPSTER FLOAT ENDLS {
       cout << "reading a codedumpster file version " << $2 << endl;
-    }
+  }
   ;
 body_section:
   assembly_lines
@@ -87,7 +88,8 @@ single_reg_line:
 reg_type_line:
     INSTR REG REG ENDLS {
       cout << "op: " << $1 << " Rdst: " << $3 << " Rsrc: " << $2 << endl;
-      Instruction i = Instruction($1, $2, $3);
+      Instruction instr = Instruction($1, $2, $3);
+      fprintf(yyout, "%s\n", instr.instruction.c_str());
       free($1);
       free($2);
       free($3);
@@ -152,17 +154,39 @@ ENDLS:
 
 int main(int argc, char *argv[]) {
   // Open a file handle to a particular file:
-  FILE *myfile = fopen(argv[1], "r");
-  // Make sure it is valid:
-  if (!myfile) {
-    cout << "I can't open that file!" << endl;
-    return -1;
+  if(argc == 1) {
+    cout << "Missing command line arguments." << endl;
+    exit(-1);
   }
-  // Set Flex to read from it instead of defaulting to STDIN:
-  yyin = myfile;
+  else if(argc == 2) {
+    cout << "Missing write file" << endl;
+  }
+  else if(argc == 3){
+    FILE *readfile = fopen(argv[1], "r");
+    FILE *writefile = fopen(argv[2], "w+");
 
-  // Parse through the input:
-  yyparse();
+    // Make sure it is valid:
+    if (!readfile) {
+      cout << "I can't open that read file!" << endl;
+      return -1;
+    }
+
+    // Make sure it is valid:
+    if (!writefile) {
+      cout << "I can't open that write file!" << endl;
+      return -1;
+    }
+
+    // Set Flex to read from it instead of defaulting to STDIN:
+    yyin = readfile;
+    yyout = writefile;
+
+    // Parse through the input:
+    yyparse();
+  }
+  else {
+    cout << "Too many arguments" << endl;
+  }
 }
 
 void yyerror(const char *s) {

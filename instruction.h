@@ -10,7 +10,7 @@ public:
   string instruction;
 
   Instruction(string op, string reg1, string reg2) {
-      buildInstruction(op, reg1, reg2);
+      instruction = buildInstruction(op, reg1, reg2);
   }
 };
 
@@ -69,122 +69,116 @@ string regToBinary(string reg) {
   return decimalToBinary(regVal, 4);
 }
 
-// convert an integer to its two's complement equivalent
-string convertToTwosComplement(int inputInteger, int length) {
-  int convertedInt = -(unsigned int)inputInteger;
-  return decimalToSignExtendedBinary(convertedInt, length);
-}
-
 // builds an instruction string
 string buildInstruction(string op, string val1, string val2) {
   string instruction = "";
-  if(op.compare("ADD")) {
+  if(!op.compare("ADD")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0101";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("ADDI")) {
+  else if(!op.compare("ADDI")) {
     instruction += "0101";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("ADDU")) {
+  else if(!op.compare("ADDU")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0110";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("ADDC")) {
+  else if(!op.compare("ADDC")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0111";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("MUL")) {
+  else if(!op.compare("MUL")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "1110";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("MULI")) {
+  else if(!op.compare("MULI")) {
     instruction += "1110";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("SUB")) {
+  else if(!op.compare("SUB")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "1001";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("SUBI") == 0) {
+  else if(!op.compare("SUBI")) {
     instruction += "1001";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("SUBC")) {
+  else if(!op.compare("SUBC")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "1010";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("SUBCI")) {
+  else if(!op.compare("SUBCI")) {
     instruction += "1010";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("CMP")) {
+  else if(!op.compare("CMP")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "1011";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("CMPI")) {
+  else if(!op.compare("CMPI")) {
     instruction += "1011";
     instruction += regToBinary(val2);
     instruction += decimalToSignExtendedBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("AND")) {
+  else if(!op.compare("AND")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0001";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("ANDI")) {
+  else if(!op.compare("ANDI")) {
     instruction += "0001";
     instruction += regToBinary(val2);
     instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("OR")) {
+  else if(!op.compare("OR")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0010";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("ORI")) {
+  else if(!op.compare("ORI")) {
     instruction += "0010";
     instruction += regToBinary(val2);
     instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("XOR")) {
+  else if(!op.compare("XOR")) {
     instruction += "0000";
     instruction += regToBinary(val2);
     instruction += "0011";
     instruction += regToBinary(val1);
   }
-  else if(op.compare("XORI")) {
+  else if(!op.compare("XORI")) {
     instruction += "0011";
     instruction += regToBinary(val2);
     instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
-  else if(op.compare("LOAD")) {
+  else if(!op.compare("LOAD")) {
     instruction += "0100";
     instruction += regToBinary(val1);
     instruction += "0000";
     instruction += regToBinary(val2);
   }
-  else if(op.compare("STOR")) {
+  else if(!op.compare("STOR")) {
     instruction += "0100";
     instruction += regToBinary(val1);
     instruction += "0100";
