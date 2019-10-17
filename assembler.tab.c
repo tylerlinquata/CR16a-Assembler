@@ -75,7 +75,9 @@
      INSTR = 264,
      REG = 265,
      IMM = 266,
-     REL = 267
+     REL = 267,
+     LABEL = 268,
+     COMMENT = 269
    };
 #endif
 /* Tokens.  */
@@ -89,6 +91,8 @@
 #define REG 265
 #define IMM 266
 #define REL 267
+#define LABEL 268
+#define COMMENT 269
 
 
 
@@ -97,6 +101,8 @@
 #line 1 "assembler.y"
 
   #include <cstdio>
+  #include <unordered_map>
+  #include <vector>
   #include <iostream>
   #include <string.h>
   #include <fstream>
@@ -107,9 +113,12 @@
   extern int yylex();
   extern int yyparse();
   extern FILE *yyin;
-  extern FILE *yyout;
   extern int lineNum;
+  unordered_map<string, int> jump_table;
+  vector<string> instruction_list;
+  ofstream writefile;
 
+  void process_label(string label);
   void yyerror(const char *s);
 
 
@@ -133,7 +142,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 27 "assembler.y"
+#line 32 "assembler.y"
 {
   int ival;
   float fval;
@@ -141,9 +150,11 @@ typedef union YYSTYPE
   char *regval;
   char *immval;
   char *relval;
+  char *label;
+  char *comment;
 }
 /* Line 193 of yacc.c.  */
-#line 147 "assembler.tab.c"
+#line 158 "assembler.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -156,7 +167,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 160 "assembler.tab.c"
+#line 171 "assembler.tab.c"
 
 #ifdef short
 # undef short
@@ -371,20 +382,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   41
+#define YYLAST   49
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  13
+#define YYNTOKENS  15
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  15
+#define YYNNTS  17
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  31
+#define YYNRULES  37
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  49
+#define YYNSTATES  57
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   267
+#define YYMAXUTOK   269
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -418,7 +429,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14
 };
 
 #if YYDEBUG
@@ -427,33 +438,35 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     7,    11,    13,    16,    19,    22,    25,
-      28,    31,    34,    37,    39,    41,    43,    45,    47,    49,
-      51,    53,    57,    62,    67,    71,    76,    81,    86,    91,
-      94,    97
+      28,    31,    34,    37,    40,    43,    45,    47,    49,    51,
+      53,    55,    57,    59,    61,    63,    67,    72,    77,    81,
+      86,    91,    96,   101,   104,   107,   110,   113
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      14,     0,    -1,    15,    16,    26,    -1,     3,     8,    27,
-      -1,    17,    -1,    17,    19,    -1,    17,    20,    -1,    17,
-      18,    -1,    17,    21,    -1,    17,    22,    -1,    17,    23,
-      -1,    17,    24,    -1,    17,    25,    -1,    19,    -1,    20,
-      -1,    18,    -1,    18,    -1,    22,    -1,    23,    -1,    24,
-      -1,    25,    -1,     9,    10,    27,    -1,     9,    10,    10,
-      27,    -1,     9,    11,    10,    27,    -1,     9,    12,    27,
-      -1,     9,    12,    10,    27,    -1,     9,    10,    12,    27,
-      -1,     9,    12,    11,    27,    -1,     9,    11,    12,    27,
-      -1,     5,    27,    -1,    27,     6,    -1,     6,    -1
+      16,     0,    -1,    17,    18,    30,    -1,     3,     8,    31,
+      -1,    19,    -1,    19,    21,    -1,    19,    22,    -1,    19,
+      20,    -1,    19,    23,    -1,    19,    24,    -1,    19,    25,
+      -1,    19,    26,    -1,    19,    27,    -1,    19,    28,    -1,
+      19,    29,    -1,    21,    -1,    22,    -1,    20,    -1,    20,
+      -1,    24,    -1,    25,    -1,    26,    -1,    27,    -1,    28,
+      -1,    29,    -1,     9,    10,    31,    -1,     9,    10,    10,
+      31,    -1,     9,    11,    10,    31,    -1,     9,    12,    31,
+      -1,     9,    12,    10,    31,    -1,     9,    10,    12,    31,
+      -1,     9,    12,    11,    31,    -1,     9,    11,    12,    31,
+      -1,    13,    31,    -1,    14,    31,    -1,     5,    31,    -1,
+      31,     6,    -1,     6,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    53,    53,    58,    63,    65,    66,    67,    68,    69,
-      70,    71,    72,    73,    74,    75,    76,    77,    78,    79,
-      80,    83,    89,    99,   108,   115,   123,   131,   139,   148,
-     151,   152
+       0,    62,    62,    67,    72,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
+      89,    90,    91,    92,    93,    96,   102,   112,   122,   131,
+     141,   151,   161,   170,   175,   177,   185,   186
 };
 #endif
 
@@ -463,10 +476,11 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "CODEDUMPSTER", "TYPE", "END", "ENDL",
-  "INT", "FLOAT", "INSTR", "REG", "IMM", "REL", "$accept", "assembler",
-  "header", "body_section", "assembly_lines", "single_reg_line",
-  "reg_type_line", "imm_type_line", "single_rel_line", "rel_reg_line",
-  "reg_rel_line", "rel_imm_line", "imm_rel_line", "footer", "ENDLS", 0
+  "INT", "FLOAT", "INSTR", "REG", "IMM", "REL", "LABEL", "COMMENT",
+  "$accept", "assembler", "header", "body_section", "assembly_lines",
+  "single_reg_line", "reg_type_line", "imm_type_line", "single_rel_line",
+  "rel_reg_line", "reg_rel_line", "rel_imm_line", "imm_rel_line",
+  "jump_label", "comment", "footer", "ENDLS", 0
 };
 #endif
 
@@ -476,26 +490,26 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267
+     265,   266,   267,   268,   269
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    13,    14,    15,    16,    17,    17,    17,    17,    17,
-      17,    17,    17,    17,    17,    17,    17,    17,    17,    17,
-      17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
-      27,    27
+       0,    15,    16,    17,    18,    19,    19,    19,    19,    19,
+      19,    19,    19,    19,    19,    19,    19,    19,    19,    19,
+      19,    19,    19,    19,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    31
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     3,     3,     1,     2,     2,     2,     2,     2,
-       2,     2,     2,     1,     1,     1,     1,     1,     1,     1,
-       1,     3,     4,     4,     3,     4,     4,     4,     4,     2,
-       2,     1
+       2,     2,     2,     2,     2,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     3,     4,     4,     3,     4,
+       4,     4,     4,     2,     2,     2,     2,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -503,37 +517,39 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     1,     0,     0,     4,    15,
-      13,    14,    17,    18,    19,    20,    31,     3,     0,     0,
-       0,     0,     2,     0,     7,     5,     6,     8,     9,    10,
-      11,    12,    30,     0,     0,    21,     0,     0,     0,     0,
-      29,     0,    22,    26,    23,    28,    25,    27,    24
+       0,     0,     0,     0,     0,     1,     0,     0,     0,     0,
+       4,    17,    15,    16,    19,    20,    21,    22,    23,    24,
+      37,     3,     0,     0,     0,    33,    34,     0,     2,     0,
+       7,     5,     6,     8,     9,    10,    11,    12,    13,    14,
+      36,     0,     0,    25,     0,     0,     0,     0,    35,     0,
+      26,    30,    27,    32,    29,    31,    28
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     7,     8,     9,    10,    11,    27,    12,
-      13,    14,    15,    22,    17
+      -1,     2,     3,     9,    10,    11,    12,    13,    33,    14,
+      15,    16,    17,    18,    19,    28,    21
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -19
+#define YYPACT_NINF -8
 static const yytype_int8 yypact[] =
 {
-      -1,     9,     6,    13,    22,   -19,     0,    25,    23,   -19,
-     -19,   -19,   -19,   -19,   -19,   -19,   -19,    27,    -5,    17,
-       3,    22,   -19,    14,   -19,   -19,   -19,   -19,   -19,   -19,
-     -19,   -19,   -19,    22,    22,    27,    22,    22,    22,    22,
-      27,    -2,    27,    27,    27,    27,    27,    27,    27
+       7,    -5,    19,    -2,    23,    -8,    13,    23,    23,    25,
+       0,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,
+      -8,    26,    -4,     6,    -6,    26,    26,    23,    -8,    16,
+      -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,
+      -8,    23,    23,    26,    23,    23,    23,    23,    26,    11,
+      26,    26,    26,    26,    26,    26,    26
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -19,   -19,   -19,   -19,   -19,    26,    28,    29,   -19,    30,
-      31,    32,    33,   -19,   -18
+      -8,    -8,    -8,    -8,    -8,    21,    31,    33,    -8,    34,
+      35,    36,    37,    38,    39,    -8,    -7
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -543,31 +559,32 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      35,    16,     1,    40,    16,    33,     5,    34,    38,    39,
-      18,    19,    20,    38,    39,    42,    43,     4,    44,    45,
-      46,    47,     6,    48,    18,    19,    41,    36,    16,    37,
-      21,     0,    23,    32,    24,     0,    25,    26,    28,    29,
-      30,    31
+      25,    26,    20,     4,    46,    47,    41,     6,    42,    29,
+       1,     7,     8,     7,     8,    43,    44,    20,    45,     5,
+      48,    46,    47,    22,    23,    24,    22,    23,    49,    20,
+      27,    30,    40,     0,    50,    51,     0,    52,    53,    54,
+      55,    31,    56,    32,    34,    35,    36,    37,    38,    39
 };
 
 static const yytype_int8 yycheck[] =
 {
-      18,     6,     3,    21,     6,    10,     0,    12,    10,    11,
-      10,    11,    12,    10,    11,    33,    34,     8,    36,    37,
-      38,    39,     9,    41,    10,    11,    12,    10,     6,    12,
-       5,    -1,     9,     6,     8,    -1,     8,     8,     8,     8,
-       8,     8
+       7,     8,     6,     8,    10,    11,    10,     9,    12,     9,
+       3,    13,    14,    13,    14,    22,    10,     6,    12,     0,
+      27,    10,    11,    10,    11,    12,    10,    11,    12,     6,
+       5,    10,     6,    -1,    41,    42,    -1,    44,    45,    46,
+      47,    10,    49,    10,    10,    10,    10,    10,    10,    10
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    14,    15,     8,     0,     9,    16,    17,    18,
-      19,    20,    22,    23,    24,    25,     6,    27,    10,    11,
-      12,     5,    26,     9,    18,    19,    20,    21,    22,    23,
-      24,    25,     6,    10,    12,    27,    10,    12,    10,    11,
-      27,    12,    27,    27,    27,    27,    27,    27,    27
+       0,     3,    16,    17,     8,     0,     9,    13,    14,    18,
+      19,    20,    21,    22,    24,    25,    26,    27,    28,    29,
+       6,    31,    10,    11,    12,    31,    31,     5,    30,     9,
+      20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
+       6,    10,    12,    31,    10,    12,    10,    11,    31,    12,
+      31,    31,    31,    31,    31,    31,    31
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1382,102 +1399,131 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 53 "assembler.y"
+#line 62 "assembler.y"
     {
       cout << "done with an asm file!" << endl;
   ;}
     break;
 
   case 3:
-#line 58 "assembler.y"
+#line 67 "assembler.y"
     {
       cout << "reading a codedumpster file version " << (yyvsp[(2) - (3)].fval) << endl;
   ;}
     break;
 
-  case 21:
-#line 83 "assembler.y"
+  case 25:
+#line 96 "assembler.y"
     {
         free((yyvsp[(1) - (3)].sval));
         free((yyvsp[(2) - (3)].regval));
     ;}
     break;
 
-  case 22:
-#line 89 "assembler.y"
+  case 26:
+#line 102 "assembler.y"
     {
       cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Rsrc: " << (yyvsp[(2) - (4)].regval) << endl;
-      Instruction instr = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].regval));
-      fprintf(yyout, "%s\n", instr.instruction.c_str());
+      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].regval));
+      instruction_list.push_back(i.instruction);
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].regval));
       free((yyvsp[(3) - (4)].regval));
     ;}
     break;
 
-  case 23:
-#line 99 "assembler.y"
+  case 27:
+#line 112 "assembler.y"
     {
       cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Imm: " << (yyvsp[(2) - (4)].immval) << endl;
       Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].regval));
+      instruction_list.push_back(i.instruction);
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].immval));
       free((yyvsp[(3) - (4)].regval));
     ;}
     break;
 
-  case 24:
-#line 108 "assembler.y"
+  case 28:
+#line 122 "assembler.y"
     {
       cout << "op: " << (yyvsp[(1) - (3)].sval) << " relative: " << (yyvsp[(2) - (3)].relval) << endl;
+      Instruction i = Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].relval));
+      instruction_list.push_back(i.instruction);
       free((yyvsp[(1) - (3)].sval));
       free((yyvsp[(2) - (3)].relval));
     ;}
     break;
 
-  case 25:
-#line 115 "assembler.y"
+  case 29:
+#line 131 "assembler.y"
     {
       cout << "R-type op: " << (yyvsp[(1) - (4)].sval) << " rel: " << (yyvsp[(2) - (4)].relval) << " reg_1: " << (yyvsp[(3) - (4)].regval) << endl;
+      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].relval), (yyvsp[(3) - (4)].regval));
+      instruction_list.push_back(i.instruction);
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].relval));
       free((yyvsp[(3) - (4)].regval));
     ;}
     break;
 
-  case 26:
-#line 123 "assembler.y"
+  case 30:
+#line 141 "assembler.y"
     {
       cout << "R-type op: " << (yyvsp[(1) - (4)].sval) << " reg: " << (yyvsp[(2) - (4)].regval) << " rel: " << (yyvsp[(3) - (4)].relval) << endl;
+      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].relval));
+      instruction_list.push_back(i.instruction);
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].regval));
       free((yyvsp[(3) - (4)].relval));
     ;}
     break;
 
-  case 27:
-#line 131 "assembler.y"
+  case 31:
+#line 151 "assembler.y"
     {
       cout << "I-type op: " << (yyvsp[(1) - (4)].sval) << " rel: " << (yyvsp[(2) - (4)].relval) << " imm: " << (yyvsp[(3) - (4)].immval) << endl;
+      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].relval), (yyvsp[(3) - (4)].immval));
+      instruction_list.push_back(i.instruction);
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].relval));
       free((yyvsp[(3) - (4)].immval));
     ;}
     break;
 
-  case 28:
-#line 139 "assembler.y"
+  case 32:
+#line 161 "assembler.y"
     {
       cout << "I-type op: " << (yyvsp[(1) - (4)].sval) << " imm: " << (yyvsp[(2) - (4)].immval) << " rel: " << (yyvsp[(3) - (4)].relval) << endl;
+      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].relval));
+      instruction_list.push_back(i.instruction);
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].immval));
       free((yyvsp[(3) - (4)].relval));
     ;}
     break;
 
+  case 33:
+#line 170 "assembler.y"
+    {
+              cout << "this is a label: " << (yyvsp[(1) - (2)].label) << endl;
+              free((yyvsp[(1) - (2)].label));
+            ;}
+    break;
+
+  case 35:
+#line 177 "assembler.y"
+    {
+    int i;
+    for(i = 0; i < instruction_list.size(); i++) {
+      writefile << instruction_list[i] << endl;
+    }
+  ;}
+    break;
+
 
 /* Line 1267 of yacc.c.  */
-#line 1481 "assembler.tab.c"
+#line 1527 "assembler.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1691,10 +1737,26 @@ yyreturn:
 }
 
 
-#line 153 "assembler.y"
+#line 187 "assembler.y"
 
+
+void process_label(string label) {
+  // remove the leading .
+  label = label.substr(1, label.size());
+
+  // check if label already exists, return error if dup
+  if(jump_table.find(label) != jump_table.end()) {
+    yyerror("Duplicate label.");
+  }
+  // add to jump table
+  else {
+    jump_table[label] = lineNum;
+  }
+  cout << jump_table[label] << endl;
+}
 
 int main(int argc, char *argv[]) {
+
   // Open a file handle to a particular file:
   if(argc == 1) {
     cout << "Missing command line arguments." << endl;
@@ -1705,7 +1767,8 @@ int main(int argc, char *argv[]) {
   }
   else if(argc == 3){
     FILE *readfile = fopen(argv[1], "r");
-    FILE *writefile = fopen(argv[2], "w+");
+
+    writefile.open(argv[2], ios::trunc);
 
     // Make sure it is valid:
     if (!readfile) {
@@ -1721,7 +1784,6 @@ int main(int argc, char *argv[]) {
 
     // Set Flex to read from it instead of defaulting to STDIN:
     yyin = readfile;
-    yyout = writefile;
 
     // Parse through the input:
     yyparse();

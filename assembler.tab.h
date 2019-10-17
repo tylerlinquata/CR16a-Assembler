@@ -48,7 +48,9 @@
      INSTR = 264,
      REG = 265,
      IMM = 266,
-     REL = 267
+     REL = 267,
+     LABEL = 268,
+     COMMENT = 269
    };
 #endif
 /* Tokens.  */
@@ -62,13 +64,15 @@
 #define REG 265
 #define IMM 266
 #define REL 267
+#define LABEL 268
+#define COMMENT 269
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 27 "assembler.y"
+#line 32 "assembler.y"
 {
   int ival;
   float fval;
@@ -76,9 +80,11 @@ typedef union YYSTYPE
   char *regval;
   char *immval;
   char *relval;
+  char *label;
+  char *comment;
 }
 /* Line 1529 of yacc.c.  */
-#line 82 "assembler.tab.h"
+#line 88 "assembler.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

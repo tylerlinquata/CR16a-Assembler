@@ -2,13 +2,13 @@ codedumpster 1.0
 ADD R5, R6
 ADDI $29, R8
 ADDI $-5, R13
-/* this is a comment */
 ADDU R4, R15
 ADDC R0, R11
+.mfinlabels
 MUL R1, R10
 MULI $19, R2
 SUB R3, R9
-SUBI $-16, R8 /* we can do in line comments too! */
+SUBI $-16, R8
 SUBC R4, R7
 SUBCI $14, R6
 CMP R5, R6

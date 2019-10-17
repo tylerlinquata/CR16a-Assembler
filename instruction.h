@@ -9,8 +9,11 @@ class Instruction {
 public:
   string instruction;
 
-  Instruction(string op, string reg1, string reg2) {
-      instruction = buildInstruction(op, reg1, reg2);
+  Instruction(string op, string val1, string val2) {
+      instruction = buildInstruction(op, val1, val2);
+  }
+  Instruction(string op, string val1) {
+    instruction = buildInstruction(op, val1, "");
   }
 };
 

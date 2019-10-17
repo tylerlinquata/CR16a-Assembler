@@ -17,7 +17,8 @@ end            	{ return END; }
 [0-9]+          { yylval.ival = atoi(yytext); 	return INT; }
 [A-Z]{2,5}   		{ yylval.sval = strdup(yytext); return INSTR; }
 [-]?[0-9]+[(][R][0-9]+[)] { yylval.relval = strdup(yytext); return REL; }
-[/\*.*\*/]			{ return ENDL; }
+[/\*.*\*/]			{ yylval.comment = strdup(yytext); cout << yytext << endl; return COMMENT; }
+[.][a-zA-Z0-9]+	{ yylval.label = strdup(yytext); return LABEL; }
 \n 							{ ++lineNum; return ENDL; }
 ,								;
 %%
