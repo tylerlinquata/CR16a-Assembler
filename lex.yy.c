@@ -805,7 +805,7 @@ YY_RULE_SETUP
 case 10:
 YY_RULE_SETUP
 #line 20 "assembler.l"
-{ return COMMENT; }
+{ yylval.comment = strdup(yytext); return COMMENT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP

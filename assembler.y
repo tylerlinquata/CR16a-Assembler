@@ -57,7 +57,7 @@
 %%
 
 // the first rule defined is the highest-level rule, which in our
-// case is just the concept of a whole "snazzle file":
+// case is just the concept of a whole assembly file:
 assembler:
   header body_section footer {
       cout << "done with an asm file!" << endl;
@@ -81,10 +81,12 @@ assembly_lines  : assembly_lines reg_type_line
                 | assembly_lines imm_rel_line
                 | assembly_lines jump_label
                 | assembly_lines comment
+                | assembly_lines branch_line
+                | branch_line
                 | reg_type_line
                 | imm_type_line
                 | single_reg_line
-                | single_reg_line
+                | single_rel_line
                 | rel_reg_line
                 | reg_rel_line
                 | rel_imm_line
@@ -92,8 +94,19 @@ assembly_lines  : assembly_lines reg_type_line
                 | jump_label
                 | comment
                 ;
+branch_line: INSTR IMM ENDLS {
+              cout << "op: " << $1 << " imm: " << $2 << endl;
+              Instruction i = Instruction($1, $2);
+              instruction_list.push_back(i.instruction);
+              free($1);
+              free($2);
+           }
+           ;
 single_reg_line:
     INSTR REG ENDLS {
+        cout << "op: " << $1 << " Rdst: " << " Rsrc: " << $2 << endl;
+        Instruction i = Instruction($1, $2);
+        instruction_list.push_back(i.instruction);
         free($1);
         free($2);
     }

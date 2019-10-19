@@ -4,6 +4,7 @@ string decimalToBinary(int decimalValue);
 string decimalToSignExtendedBinary(int decimalValue, int length);
 string regToBinary(string reg);
 string buildInstruction(string op, string reg1, string reg2);
+string integerToTwosComp(int value);
 
 class Instruction {
 public:
@@ -64,6 +65,18 @@ string decimalToSignExtendedBinary(int decimalValue, int length) {
   reverse(binary.begin(), binary.end());
 
   return binary;
+}
+
+// converts an integer to its twos complement eqivalent. output is 8 bits long\
+   credit to user Pindrought on cplusplus.com
+string integerToTwosComp(int value) {
+	string result;
+	for (int bit = 0; bit < sizeof(int) * 2; ++bit) {
+		int bit_val = 1 & value;
+		result = (bit_val ? "1" : "0") + result;
+		value = value >> 1;
+	}
+	return result;
 }
 
 // converts a register to it's binary representation
@@ -175,6 +188,62 @@ string buildInstruction(string op, string val1, string val2) {
     instruction += regToBinary(val2);
     instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
   }
+  else if(!op.compare("MOV")) {
+    instruction += "0000";
+    instruction += regToBinary(val2);
+    instruction += "1101";
+    instruction += regToBinary(val1);
+  }
+  else if(!op.compare("MOVI")) {
+    instruction += "1101";
+    instruction += regToBinary(val2);
+    instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
+  else if(!op.compare("LSH")) {
+    instruction += "1000";
+    instruction += regToBinary(val2);
+    instruction += "0100";
+    instruction += regToBinary(val1);
+  }
+  else if(!op.compare("LSHI")) {
+    int imm;
+    imm = stoi(val1.substr(1, val1.size()));
+    instruction += "1000";
+    instruction += regToBinary(val2);
+    instruction += "000";
+    if(imm >= 0) {
+      instruction += "0";
+    }
+    else {
+      instruction += "1";
+    }
+    instruction += decimalToBinary(imm, 4);
+  }
+  else if(!op.compare("ASHU")) {
+    instruction += "1000";
+    instruction += regToBinary(val2);
+    instruction += "0100";
+    instruction += regToBinary(val1);
+  }
+  else if(!op.compare("ASHUI")) {
+    int imm;
+    imm = stoi(val1.substr(1, val1.size()));
+    instruction += "1000";
+    instruction += regToBinary(val2);
+    instruction += "001";
+    if(imm >= 0) {
+      instruction += "0";
+    }
+    else {
+      instruction += "1";
+    }
+    instruction += decimalToBinary(imm, 4);
+  }
+  else if(!op.compare("LUI")) {
+    instruction += "1111";
+    instruction += regToBinary(val2);
+    instruction += decimalToBinary(stoi(val1.substr(1, val1.size())), 8);
+  }
   else if(!op.compare("LOAD")) {
     instruction += "0100";
     instruction += regToBinary(val1);
@@ -187,8 +256,101 @@ string buildInstruction(string op, string val1, string val2) {
     instruction += "0100";
     instruction += regToBinary(val2);
   }
+  else if(!op.compare("BEQ")) {
+    int disp;
+    disp = stoi(val1.substr(1, val1.size()));
+    instruction += "11000000";
+    if(disp > -64 && disp < 63) {
+      if(disp > 0) {
+        instruction += decimalToBinary(disp, 8);
+      }
+      else {
+        instruction += integerToTwosComp(disp);
+      }
+    }
+  }
+  else if(!op.compare("BNE")) {
+    int disp;
+    disp = stoi(val1.substr(1, val1.size()));
+    instruction += "11000001";
+    if(disp > -64 && disp < 63) {
+      if(disp > 0) {
+        instruction += decimalToBinary(disp, 8);
+      }
+      else {
+        instruction += integerToTwosComp(disp);
+      }
+    }
+  }
+  else if(!op.compare("BGE")) {
+    int disp;
+    disp = stoi(val1.substr(1, val1.size()));
+    instruction += "11001101";
+    if(disp > -64 && disp < 63) {
+      if(disp > 0) {
+        instruction += decimalToBinary(disp, 8);
+      }
+      else {
+        instruction += integerToTwosComp(disp);
+      }
+    }
+  }
+  else if(!op.compare("BGT")) {
+    int disp;
+    disp = stoi(val1.substr(1, val1.size()));
+    instruction += "11000110";
+    if(disp > -64 && disp < 63) {
+      if(disp > 0) {
+        instruction += decimalToBinary(disp, 8);
+      }
+      else {
+        instruction += integerToTwosComp(disp);
+      }
+    }
+  }
+  else if(!op.compare("BLE")) {
+    int disp;
+    disp = stoi(val1.substr(1, val1.size()));
+    instruction += "11000111";
+    if(disp > -64 && disp < 63) {
+      if(disp > 0) {
+        instruction += decimalToBinary(disp, 8);
+      }
+      else {
+        instruction += integerToTwosComp(disp);
+      }
+    }
+  }
+  else if(!op.compare("BLT")) {
+    int disp;
+    disp = stoi(val1.substr(1, val1.size()));
+    instruction += "11001100";
+    if(disp > -64 && disp < 63) {
+      if(disp > 0) {
+        instruction += decimalToBinary(disp, 8);
+      }
+      else {
+        instruction += integerToTwosComp(disp);
+      }
+    }
+  }
+  else if(!op.compare("BUC")) {
+    int disp;
+    disp = stoi(val1.substr(1, val1.size()));
+    instruction += "11001110";
+    if(disp > -64 && disp < 63) {
+      if(disp > 0) {
+        instruction += decimalToBinary(disp, 8);
+      }
+      else {
+        instruction += integerToTwosComp(disp);
+      }
+    }
+  }
 
-  // TODO all instructions past LSH
+
+
+  }
 
   cout << instruction << endl;
   return instruction;
