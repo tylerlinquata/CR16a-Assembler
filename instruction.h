@@ -347,6 +347,48 @@ string buildInstruction(string op, string val1, string val2) {
       }
     }
   }
+  else if(!op.compare("SEQ")) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "1101";
+    instruction += "0000";
+  }
+  else if(!op.compare("SNE")) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "1101";
+    instruction += "0001";
+  }
+  else if(!op.compare("SGE")) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "1101";
+    instruction += "1101";
+  }
+  else if(!op.compare("SGT")) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "1101";
+    instruction += "0110";
+  }
+  else if(!op.compare("SLE")) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "1101";
+    instruction += "0111";
+  }
+  else if(!op.compare("SLT")) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "1101";
+    instruction += "1100";
+  }
+  else if(!op.compare("SUC")) {
+    instruction += "0100";
+    instruction += regToBinary(val1);
+    instruction += "1101";
+    instruction += "1110";
+  }
 
 
 
