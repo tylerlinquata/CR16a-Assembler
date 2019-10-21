@@ -399,7 +399,42 @@ string buildInstruction(string op, string val1, string val2) {
      instruction += "1100";
      instruction += regToBinary(val1);
   }
-
+  else if(!op.compare("JNE")) {
+     instruction += "0100";
+     instruction += "0001";
+     instruction += "1100";
+     instruction += regToBinary(val1);
+  }
+  else if(!op.compare("JGE")) {
+     instruction += "0100";
+     instruction += "1101";
+     instruction += "1100";
+     instruction += regToBinary(val1);
+  }
+  else if(!op.compare("JGT")) {
+     instruction += "0100";
+     instruction += "0110";
+     instruction += "1100";
+     instruction += regToBinary(val1);
+  }
+  else if(!op.compare("JLE")) {
+     instruction += "0100";
+     instruction += "0111";
+     instruction += "1100";
+     instruction += regToBinary(val1);
+  }
+  else if(!op.compare("JLT")) {
+     instruction += "0100";
+     instruction += "1100";
+     instruction += "1100";
+     instruction += regToBinary(val1);
+  }
+  else if(!op.compare("JUC")) {
+     instruction += "0100";
+     instruction += "1110";
+     instruction += "1100";
+     instruction += regToBinary(val1);
+  }
 
 
   cout << instruction << endl;
