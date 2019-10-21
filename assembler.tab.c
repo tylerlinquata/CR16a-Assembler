@@ -119,6 +119,7 @@
   unordered_map<string, int> jump_table;
   // stores a map of instructions that were called before their label
   unordered_map<string, int> unfilled_jumps;
+  unordered_map<string, int> unfilled_branches;
   // stores a list of all parsed instructions
   vector<string> instruction_list;
   // file that machine code is written to
@@ -155,7 +156,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 51 "assembler.y"
+#line 52 "assembler.y"
 {
   int ival;
   float fval;
@@ -167,7 +168,7 @@ typedef union YYSTYPE
   char *comment;
 }
 /* Line 193 of yacc.c.  */
-#line 171 "assembler.tab.c"
+#line 172 "assembler.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -180,7 +181,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 184 "assembler.tab.c"
+#line 185 "assembler.tab.c"
 
 #ifdef short
 # undef short
@@ -479,11 +480,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    81,    81,    86,    91,    93,    94,    95,    96,    97,
-      98,    99,   100,   101,   102,   103,   104,   105,   106,   107,
-     108,   109,   110,   111,   112,   113,   114,   115,   116,   119,
-     127,   135,   144,   153,   161,   170,   179,   188,   197,   204,
-     210,   212,   218,   219
+       0,    82,    82,    87,    92,    94,    95,    96,    97,    98,
+      99,   100,   101,   102,   103,   104,   105,   106,   107,   108,
+     109,   110,   111,   112,   113,   114,   115,   116,   117,   120,
+     128,   136,   145,   154,   162,   171,   180,   189,   198,   205,
+     211,   213,   219,   220
 };
 #endif
 
@@ -1422,21 +1423,21 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 81 "assembler.y"
+#line 82 "assembler.y"
     {
       cout << "done with an asm file!" << endl;
   ;}
     break;
 
   case 3:
-#line 86 "assembler.y"
+#line 87 "assembler.y"
     {
       cout << "reading a codedumpster file version " << (yyvsp[(2) - (3)].fval) << endl;
   ;}
     break;
 
   case 29:
-#line 119 "assembler.y"
+#line 120 "assembler.y"
     {
     cout << "op: " << (yyvsp[(1) - (3)].sval) << " imm: " << (yyvsp[(2) - (3)].immval) << endl;
     add_instruction(Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].immval)));
@@ -1446,7 +1447,7 @@ yyreduce:
     break;
 
   case 30:
-#line 127 "assembler.y"
+#line 128 "assembler.y"
     {
     cout << "op: " << (yyvsp[(1) - (3)].sval) << " Rdst: " << " Rsrc: " << (yyvsp[(2) - (3)].regval) << endl;
     add_instruction(Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].regval)));
@@ -1456,7 +1457,7 @@ yyreduce:
     break;
 
   case 31:
-#line 135 "assembler.y"
+#line 136 "assembler.y"
     {
       cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Rsrc: " << (yyvsp[(2) - (4)].regval) << endl;
       add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].regval)));
@@ -1467,7 +1468,7 @@ yyreduce:
     break;
 
   case 32:
-#line 144 "assembler.y"
+#line 145 "assembler.y"
     {
       cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Imm: " << (yyvsp[(2) - (4)].immval) << endl;
       add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].regval)));
@@ -1478,7 +1479,7 @@ yyreduce:
     break;
 
   case 33:
-#line 153 "assembler.y"
+#line 154 "assembler.y"
     {
       cout << "op: " << (yyvsp[(1) - (3)].sval) << " relative: " << (yyvsp[(2) - (3)].relval) << endl;
       add_instruction(Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].relval)));
@@ -1488,7 +1489,7 @@ yyreduce:
     break;
 
   case 34:
-#line 161 "assembler.y"
+#line 162 "assembler.y"
     {
       cout << "R-type op: " << (yyvsp[(1) - (4)].sval) << " rel: " << (yyvsp[(2) - (4)].relval) << " reg_1: " << (yyvsp[(3) - (4)].regval) << endl;
       add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].relval), (yyvsp[(3) - (4)].regval)));
@@ -1499,7 +1500,7 @@ yyreduce:
     break;
 
   case 35:
-#line 170 "assembler.y"
+#line 171 "assembler.y"
     {
       cout << "R-type op: " << (yyvsp[(1) - (4)].sval) << " reg: " << (yyvsp[(2) - (4)].regval) << " rel: " << (yyvsp[(3) - (4)].relval) << endl;
       add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].relval)));
@@ -1510,7 +1511,7 @@ yyreduce:
     break;
 
   case 36:
-#line 179 "assembler.y"
+#line 180 "assembler.y"
     {
       cout << "I-type op: " << (yyvsp[(1) - (4)].sval) << " rel: " << (yyvsp[(2) - (4)].relval) << " imm: " << (yyvsp[(3) - (4)].immval) << endl;
       add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].relval), (yyvsp[(3) - (4)].immval)));
@@ -1521,7 +1522,7 @@ yyreduce:
     break;
 
   case 37:
-#line 188 "assembler.y"
+#line 189 "assembler.y"
     {
       cout << "I-type op: " << (yyvsp[(1) - (4)].sval) << " imm: " << (yyvsp[(2) - (4)].immval) << " rel: " << (yyvsp[(3) - (4)].relval) << endl;
       add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].relval)));
@@ -1532,7 +1533,7 @@ yyreduce:
     break;
 
   case 38:
-#line 197 "assembler.y"
+#line 198 "assembler.y"
     {
       cout << "this is a label: " << (yyvsp[(1) - (2)].label) << endl;
       process_label((yyvsp[(1) - (2)].label));
@@ -1541,7 +1542,7 @@ yyreduce:
     break;
 
   case 39:
-#line 204 "assembler.y"
+#line 205 "assembler.y"
     {
       label_instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].label));
       free((yyvsp[(1) - (3)].sval));
@@ -1550,7 +1551,7 @@ yyreduce:
     break;
 
   case 41:
-#line 212 "assembler.y"
+#line 213 "assembler.y"
     {
     repair_labels();
     write_instructions_to_file();
@@ -1559,7 +1560,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1563 "assembler.tab.c"
+#line 1564 "assembler.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1773,7 +1774,7 @@ yyreturn:
 }
 
 
-#line 220 "assembler.y"
+#line 221 "assembler.y"
 
 
 // writes all instructions in the instruction list to the specified file
@@ -1787,6 +1788,7 @@ void write_instructions_to_file() {
 // fixed instructions that were written with undeclared labels
 void repair_labels() {
   int replace_line;
+  string replacement_string;
   // iterate over each instruction that needs to be fixed
   for(auto const& it: unfilled_jumps) {
     replace_line = it.second - 1;
@@ -1794,31 +1796,57 @@ void repair_labels() {
     Instruction i = Instruction("MOVI", "$" + to_string(jump_table[it.first]), "R15");
     instruction_list[replace_line] = i.instruction;
   }
+  for(auto const& it: unfilled_branches) {
+    replace_line = it.second - 1;
+    // get binary string for displacement by trimming off first 8 characters
+    Instruction i = Instruction("BNE", "$" + to_string(jump_table[it.first] - replace_line));
+    // trim off first 8 values as we only care about last 8
+    replacement_string = i.instruction.substr(8, i.instruction.size());
+    instruction_list[replace_line] = instruction_list[replace_line].replace(8, 8,
+      replacement_string);
+  }
 }
 
 // processes an instruction called with a label
 void label_instruction(string op, string label) {
-  if(jump_table.find(label) != jump_table.end()) {
-    cout << "op: MOVI, imm: " + to_string(jump_table[label]) + " reg: R15"<< endl;
-    // put the address into R15
-    add_instruction(Instruction("MOVI", "$" + to_string(jump_table[label]), "R15"));
-  }
-  else {
-    // because we don't know where the label is yet we fill with zeroes
-    cout << "op: MOVI, imm: $" + to_string(0) + " reg: R15"<< endl;
-    add_instruction(Instruction("MOVI", "$0", "R15"));
-    // save this instruction to a list of instructions to be filled at EOF
-    unfilled_jumps[label] = instruction_list_index;
-  }
+  // if the operation is jump
+  if(op[0] == 'J') {
+    if(jump_table.find(label) != jump_table.end()) {
+      cout << "op: MOVI, imm: " + to_string(jump_table[label]) + " reg: R15"<< endl;
+      // put the address into R15
+      add_instruction(Instruction("MOVI", "$" + to_string(jump_table[label]), "R15"));
+    }
+    else {
+      // because we don't know where the label is yet we fill with zeroes
+      cout << "op: MOVI, imm: $" + to_string(0) + " reg: R15" << endl;
+      add_instruction(Instruction("MOVI", "$0", "R15"));
+      // save this instruction to a list of instructions to be filled at EOF
+      unfilled_jumps[label] = instruction_list_index;
+    }
 
-  cout << "op: " << op << " reg: R15" << endl;
-  // branch or jump to value in R15
-  add_instruction(Instruction(op, "R15"));
+    cout << "op: " << op << " reg: R15" << endl;
+    // branch or jump to value in R15
+    add_instruction(Instruction(op, "R15"));
+  }
+  // if the operation is a branch
+  if(op[0] == 'B') {
+    if(jump_table.find(label) != jump_table.end()) {
+      cout << "op: B, imm: $" << (jump_table[label] - instruction_list_index - 1) << endl;
+      // put the address into R15
+      add_instruction(Instruction(op, "$" + to_string(jump_table[label] - instruction_list_index - 1)));
+      cout << label << endl;
+    }
+    else {
+      // make an empty instruction
+      add_instruction(Instruction(op, "$0"));
+      // save the line that needs to be changed later
+      unfilled_branches[label] = instruction_list_index;
+    }
+  }
 }
 
 // adds a label to the jump table
 void process_label(string label) {
-
   // check if label already exists, return error if dup
   if(jump_table.find(label) != jump_table.end()) {
     yyerror("Duplicate label.");

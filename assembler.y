@@ -24,6 +24,7 @@
   unordered_map<string, int> jump_table;
   // stores a map of instructions that were called before their label
   unordered_map<string, int> unfilled_jumps;
+  unordered_map<string, int> unfilled_branches;
   // stores a list of all parsed instructions
   vector<string> instruction_list;
   // file that machine code is written to
@@ -230,6 +231,7 @@ void write_instructions_to_file() {
 // fixed instructions that were written with undeclared labels
 void repair_labels() {
   int replace_line;
+  string replacement_string;
   // iterate over each instruction that needs to be fixed
   for(auto const& it: unfilled_jumps) {
     replace_line = it.second - 1;
@@ -237,31 +239,57 @@ void repair_labels() {
     Instruction i = Instruction("MOVI", "$" + to_string(jump_table[it.first]), "R15");
     instruction_list[replace_line] = i.instruction;
   }
+  for(auto const& it: unfilled_branches) {
+    replace_line = it.second - 1;
+    // get binary string for displacement by trimming off first 8 characters
+    Instruction i = Instruction("BNE", "$" + to_string(jump_table[it.first] - replace_line));
+    // trim off first 8 values as we only care about last 8
+    replacement_string = i.instruction.substr(8, i.instruction.size());
+    instruction_list[replace_line] = instruction_list[replace_line].replace(8, 8,
+      replacement_string);
+  }
 }
 
 // processes an instruction called with a label
 void label_instruction(string op, string label) {
-  if(jump_table.find(label) != jump_table.end()) {
-    cout << "op: MOVI, imm: " + to_string(jump_table[label]) + " reg: R15"<< endl;
-    // put the address into R15
-    add_instruction(Instruction("MOVI", "$" + to_string(jump_table[label]), "R15"));
-  }
-  else {
-    // because we don't know where the label is yet we fill with zeroes
-    cout << "op: MOVI, imm: $" + to_string(0) + " reg: R15"<< endl;
-    add_instruction(Instruction("MOVI", "$0", "R15"));
-    // save this instruction to a list of instructions to be filled at EOF
-    unfilled_jumps[label] = instruction_list_index;
-  }
+  // if the operation is jump
+  if(op[0] == 'J') {
+    if(jump_table.find(label) != jump_table.end()) {
+      cout << "op: MOVI, imm: " + to_string(jump_table[label]) + " reg: R15"<< endl;
+      // put the address into R15
+      add_instruction(Instruction("MOVI", "$" + to_string(jump_table[label]), "R15"));
+    }
+    else {
+      // because we don't know where the label is yet we fill with zeroes
+      cout << "op: MOVI, imm: $" + to_string(0) + " reg: R15" << endl;
+      add_instruction(Instruction("MOVI", "$0", "R15"));
+      // save this instruction to a list of instructions to be filled at EOF
+      unfilled_jumps[label] = instruction_list_index;
+    }
 
-  cout << "op: " << op << " reg: R15" << endl;
-  // branch or jump to value in R15
-  add_instruction(Instruction(op, "R15"));
+    cout << "op: " << op << " reg: R15" << endl;
+    // branch or jump to value in R15
+    add_instruction(Instruction(op, "R15"));
+  }
+  // if the operation is a branch
+  if(op[0] == 'B') {
+    if(jump_table.find(label) != jump_table.end()) {
+      cout << "op: B, imm: $" << (jump_table[label] - instruction_list_index - 1) << endl;
+      // put the address into R15
+      add_instruction(Instruction(op, "$" + to_string(jump_table[label] - instruction_list_index - 1)));
+      cout << label << endl;
+    }
+    else {
+      // make an empty instruction
+      add_instruction(Instruction(op, "$0"));
+      // save the line that needs to be changed later
+      unfilled_branches[label] = instruction_list_index;
+    }
+  }
 }
 
 // adds a label to the jump table
 void process_label(string label) {
-
   // check if label already exists, return error if dup
   if(jump_table.find(label) != jump_table.end()) {
     yyerror("Duplicate label.");

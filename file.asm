@@ -26,9 +26,8 @@ LSH R6, R4
 LSHI $-7, R9
 LOAD R1, R2
 STOR R1, R2
-BEQ $-11
-BEQ $65
-BEQ $45
+BEQ .labelsarefun
+BEQ .jumpbeforelabel
 JEQ .labelsarefun
 JEQ .jumpbeforelabel
 .jumpbeforelabel
