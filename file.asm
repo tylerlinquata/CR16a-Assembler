@@ -5,7 +5,7 @@ ADDI $-5, R13
 // comment? idk?
 ADDU R4, R15
 ADDC R0, R11
-.mfinlabels
+.labelsarefun
 MUL R1, R10
 MULI $19, R2
 SUB R3, R9
@@ -29,4 +29,8 @@ STOR R1, R2
 BEQ $-11
 BEQ $65
 BEQ $45
+JEQ .labelsarefun
+JEQ .jumpbeforelabel
+.jumpbeforelabel
+ANDI $0, R4
 end

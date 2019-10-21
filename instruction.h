@@ -1,3 +1,7 @@
+/* A set of functions that builds an instruction in machine code from CR-16 assembly
+ * Author: Tyler Linquata
+ */
+
 using namespace std;
 
 string decimalToBinary(int decimalValue);
@@ -389,10 +393,14 @@ string buildInstruction(string op, string val1, string val2) {
     instruction += "1101";
     instruction += "1110";
   }
-
-
-
+  else if(!op.compare("JEQ")) {
+     instruction += "0100";
+     instruction += "0000";
+     instruction += "1100";
+     instruction += regToBinary(val1);
   }
+
+
 
   cout << instruction << endl;
   return instruction;

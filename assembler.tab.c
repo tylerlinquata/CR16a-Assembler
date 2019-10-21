@@ -98,7 +98,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "assembler.y"
+#line 7 "assembler.y"
 
   #include <cstdio>
   #include <unordered_map>
@@ -114,10 +114,23 @@
   extern int yyparse();
   extern FILE *yyin;
   extern int lineNum;
-  unordered_map<string, int> jump_table;
-  vector<string> instruction_list;
-  ofstream writefile;
 
+  // stores a map of all labels to their address
+  unordered_map<string, int> jump_table;
+  // stores a map of instructions that were called before their label
+  unordered_map<string, int> unfilled_jumps;
+  // stores a list of all parsed instructions
+  vector<string> instruction_list;
+  // file that machine code is written to
+  ofstream writefile;
+  // tracks the machine code line number
+  int instruction_list_index;
+
+  // various helper methods
+  void write_instructions_to_file();
+  void repair_labels();
+  void label_instruction(string instruction, string label);
+  void add_instruction(Instruction i);
   void process_label(string label);
   void yyerror(const char *s);
 
@@ -142,7 +155,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 32 "assembler.y"
+#line 51 "assembler.y"
 {
   int ival;
   float fval;
@@ -154,7 +167,7 @@ typedef union YYSTYPE
   char *comment;
 }
 /* Line 193 of yacc.c.  */
-#line 158 "assembler.tab.c"
+#line 171 "assembler.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -167,7 +180,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 171 "assembler.tab.c"
+#line 184 "assembler.tab.c"
 
 #ifdef short
 # undef short
@@ -382,16 +395,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   44
+#define YYLAST   47
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  15
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  18
+#define YYNNTS  19
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  40
+#define YYNRULES  43
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  59
+#define YYNSTATES  63
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -438,38 +451,39 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     7,    11,    13,    16,    19,    22,    25,
-      28,    31,    34,    37,    40,    43,    46,    48,    50,    52,
-      54,    56,    58,    60,    62,    64,    66,    68,    72,    76,
-      81,    86,    90,    95,   100,   105,   110,   113,   116,   119,
-     122
+      28,    31,    34,    37,    40,    43,    46,    49,    51,    53,
+      55,    57,    59,    61,    63,    65,    67,    69,    71,    73,
+      77,    81,    86,    91,    95,   100,   105,   110,   115,   118,
+     122,   125,   128,   131
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      16,     0,    -1,    17,    18,    31,    -1,     3,     8,    32,
+      16,     0,    -1,    17,    18,    32,    -1,     3,     8,    33,
       -1,    19,    -1,    19,    22,    -1,    19,    23,    -1,    19,
       21,    -1,    19,    24,    -1,    19,    25,    -1,    19,    26,
       -1,    19,    27,    -1,    19,    28,    -1,    19,    29,    -1,
-      19,    30,    -1,    19,    20,    -1,    20,    -1,    22,    -1,
-      23,    -1,    21,    -1,    24,    -1,    25,    -1,    26,    -1,
-      27,    -1,    28,    -1,    29,    -1,    30,    -1,     9,    11,
-      32,    -1,     9,    10,    32,    -1,     9,    10,    10,    32,
-      -1,     9,    11,    10,    32,    -1,     9,    12,    32,    -1,
-       9,    12,    10,    32,    -1,     9,    10,    12,    32,    -1,
-       9,    12,    11,    32,    -1,     9,    11,    12,    32,    -1,
-      13,    32,    -1,    14,    32,    -1,     5,    32,    -1,    32,
-       6,    -1,     6,    -1
+      19,    31,    -1,    19,    20,    -1,    19,    30,    -1,    20,
+      -1,    22,    -1,    23,    -1,    21,    -1,    24,    -1,    25,
+      -1,    26,    -1,    27,    -1,    28,    -1,    29,    -1,    31,
+      -1,    30,    -1,     9,    11,    33,    -1,     9,    10,    33,
+      -1,     9,    10,    10,    33,    -1,     9,    11,    10,    33,
+      -1,     9,    12,    33,    -1,     9,    12,    10,    33,    -1,
+       9,    10,    12,    33,    -1,     9,    12,    11,    33,    -1,
+       9,    11,    12,    33,    -1,    13,    33,    -1,     9,    13,
+      33,    -1,    14,    33,    -1,     5,    33,    -1,    33,     6,
+      -1,     6,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    62,    62,    67,    72,    74,    75,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,    86,    87,    88,
-      89,    90,    91,    92,    93,    94,    95,    97,   106,   115,
-     125,   135,   144,   154,   164,   174,   183,   188,   190,   198,
-     199
+       0,    81,    81,    86,    91,    93,    94,    95,    96,    97,
+      98,    99,   100,   101,   102,   103,   104,   105,   106,   107,
+     108,   109,   110,   111,   112,   113,   114,   115,   116,   119,
+     127,   135,   144,   153,   161,   170,   179,   188,   197,   204,
+     210,   212,   218,   219
 };
 #endif
 
@@ -483,7 +497,8 @@ static const char *const yytname[] =
   "$accept", "assembler", "header", "body_section", "assembly_lines",
   "branch_line", "single_reg_line", "reg_type_line", "imm_type_line",
   "single_rel_line", "rel_reg_line", "reg_rel_line", "rel_imm_line",
-  "imm_rel_line", "jump_label", "comment", "footer", "ENDLS", 0
+  "imm_rel_line", "jump_label", "op_label_line", "comment", "footer",
+  "ENDLS", 0
 };
 #endif
 
@@ -502,19 +517,19 @@ static const yytype_uint8 yyr1[] =
 {
        0,    15,    16,    17,    18,    19,    19,    19,    19,    19,
       19,    19,    19,    19,    19,    19,    19,    19,    19,    19,
-      19,    19,    19,    19,    19,    19,    19,    20,    21,    22,
-      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
-      32
+      19,    19,    19,    19,    19,    19,    19,    19,    19,    20,
+      21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
+      31,    32,    33,    33
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     3,     3,     1,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     3,     3,     4,
-       4,     3,     4,     4,     4,     4,     2,     2,     2,     2,
-       1
+       2,     2,     2,     2,     2,     2,     2,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     3,
+       3,     4,     4,     3,     4,     4,     4,     4,     2,     3,
+       2,     2,     2,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -523,18 +538,19 @@ static const yytype_uint8 yyr2[] =
 static const yytype_uint8 yydefact[] =
 {
        0,     0,     0,     0,     0,     1,     0,     0,     0,     0,
-       4,    16,    19,    17,    18,    20,    21,    22,    23,    24,
-      25,    26,    40,     3,     0,     0,     0,    36,    37,     0,
-       2,    15,     7,     5,     6,     8,     9,    10,    11,    12,
-      13,    14,    39,     0,     0,    28,     0,     0,    27,     0,
-       0,    31,    38,    29,    33,    30,    35,    32,    34
+       4,    17,    20,    18,    19,    21,    22,    23,    24,    25,
+      26,    28,    27,    43,     3,     0,     0,     0,     0,    38,
+      40,     0,     2,    15,     7,     5,     6,     8,     9,    10,
+      11,    12,    13,    16,    14,    42,     0,     0,    30,     0,
+       0,    29,     0,     0,    33,    39,    41,    31,    35,    32,
+      37,    34,    36
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
       -1,     2,     3,     9,    10,    11,    12,    13,    14,    15,
-      16,    17,    18,    19,    20,    21,    30,    23
+      16,    17,    18,    19,    20,    21,    22,    32,    24
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
@@ -542,19 +558,20 @@ static const yytype_int8 yydefgoto[] =
 #define YYPACT_NINF -8
 static const yytype_int8 yypact[] =
 {
-       2,     3,     4,     1,     6,    -8,    13,     6,     6,     8,
+       2,     3,     4,     1,     7,    -8,    15,     7,     7,    17,
        1,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,
-      -8,    -8,    -8,    20,    -4,    -3,    10,    20,    20,     6,
-      -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,
-      -8,    -8,    -8,     6,     6,    20,     6,     6,    20,     6,
-       6,    20,    20,    20,    20,    20,    20,    20,    20
+      -8,    -8,    -8,    -8,    23,    -4,    -3,     6,     7,    23,
+      23,     7,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,
+      -8,    -8,    -8,    -8,    -8,    -8,     7,     7,    23,     7,
+       7,    23,     7,     7,    23,    23,    23,    23,    23,    23,
+      23,    23,    23
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -8,    -8,    -8,    -8,    -8,    17,    18,    19,    21,    22,
-      23,    24,    25,    28,    31,    34,    -8,    -7
+      -8,    -8,    -8,    -8,    -8,    13,    20,    21,    22,    24,
+      25,    26,    27,    28,    31,    34,    37,    -8,    -7
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -564,20 +581,20 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      27,    28,    22,    22,     5,     1,    43,    46,    44,    47,
-       6,     4,    22,    29,     7,     8,    22,    45,    48,    51,
-      49,    50,    52,    24,    25,    26,    42,    31,    32,    33,
-       0,    34,    35,    36,    37,    38,    53,    54,    39,    55,
-      56,    40,    57,    58,    41
+      29,    30,    23,    23,     5,     1,    46,    49,    47,    50,
+       6,     4,    23,    23,     7,     8,    52,    53,    48,    51,
+      54,    55,    31,    33,    56,    25,    26,    27,    28,    45,
+      34,    35,    36,     0,    37,    38,    39,    40,    41,    57,
+      58,    42,    59,    60,    43,    61,    62,    44
 };
 
 static const yytype_int8 yycheck[] =
 {
        7,     8,     6,     6,     0,     3,    10,    10,    12,    12,
-       9,     8,     6,     5,    13,    14,     6,    24,    25,    26,
-      10,    11,    29,    10,    11,    12,     6,    10,    10,    10,
-      -1,    10,    10,    10,    10,    10,    43,    44,    10,    46,
-      47,    10,    49,    50,    10
+       9,     8,     6,     6,    13,    14,    10,    11,    25,    26,
+      27,    28,     5,    10,    31,    10,    11,    12,    13,     6,
+      10,    10,    10,    -1,    10,    10,    10,    10,    10,    46,
+      47,    10,    49,    50,    10,    52,    53,    10
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -586,10 +603,11 @@ static const yytype_uint8 yystos[] =
 {
        0,     3,    16,    17,     8,     0,     9,    13,    14,    18,
       19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,     6,    32,    10,    11,    12,    32,    32,     5,
-      31,    20,    21,    22,    23,    24,    25,    26,    27,    28,
-      29,    30,     6,    10,    12,    32,    10,    12,    32,    10,
-      11,    32,    32,    32,    32,    32,    32,    32,    32
+      29,    30,    31,     6,    33,    10,    11,    12,    13,    33,
+      33,     5,    32,    20,    21,    22,    23,    24,    25,    26,
+      27,    28,    29,    30,    31,     6,    10,    12,    33,    10,
+      12,    33,    10,    11,    33,    33,    33,    33,    33,    33,
+      33,    33,    33
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1404,145 +1422,144 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 62 "assembler.y"
+#line 81 "assembler.y"
     {
       cout << "done with an asm file!" << endl;
   ;}
     break;
 
   case 3:
-#line 67 "assembler.y"
+#line 86 "assembler.y"
     {
       cout << "reading a codedumpster file version " << (yyvsp[(2) - (3)].fval) << endl;
   ;}
     break;
 
-  case 27:
-#line 97 "assembler.y"
-    {
-              cout << "op: " << (yyvsp[(1) - (3)].sval) << " imm: " << (yyvsp[(2) - (3)].immval) << endl;
-              Instruction i = Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].immval));
-              instruction_list.push_back(i.instruction);
-              free((yyvsp[(1) - (3)].sval));
-              free((yyvsp[(2) - (3)].immval));
-           ;}
-    break;
-
-  case 28:
-#line 106 "assembler.y"
-    {
-        cout << "op: " << (yyvsp[(1) - (3)].sval) << " Rdst: " << " Rsrc: " << (yyvsp[(2) - (3)].regval) << endl;
-        Instruction i = Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].regval));
-        instruction_list.push_back(i.instruction);
-        free((yyvsp[(1) - (3)].sval));
-        free((yyvsp[(2) - (3)].regval));
-    ;}
-    break;
-
   case 29:
-#line 115 "assembler.y"
+#line 119 "assembler.y"
     {
-      cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Rsrc: " << (yyvsp[(2) - (4)].regval) << endl;
-      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].regval));
-      instruction_list.push_back(i.instruction);
-      free((yyvsp[(1) - (4)].sval));
-      free((yyvsp[(2) - (4)].regval));
-      free((yyvsp[(3) - (4)].regval));
+    cout << "op: " << (yyvsp[(1) - (3)].sval) << " imm: " << (yyvsp[(2) - (3)].immval) << endl;
+    add_instruction(Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].immval)));
+    free((yyvsp[(1) - (3)].sval));
+    free((yyvsp[(2) - (3)].immval));
     ;}
     break;
 
   case 30:
-#line 125 "assembler.y"
+#line 127 "assembler.y"
     {
-      cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Imm: " << (yyvsp[(2) - (4)].immval) << endl;
-      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].regval));
-      instruction_list.push_back(i.instruction);
-      free((yyvsp[(1) - (4)].sval));
-      free((yyvsp[(2) - (4)].immval));
-      free((yyvsp[(3) - (4)].regval));
+    cout << "op: " << (yyvsp[(1) - (3)].sval) << " Rdst: " << " Rsrc: " << (yyvsp[(2) - (3)].regval) << endl;
+    add_instruction(Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].regval)));
+    free((yyvsp[(1) - (3)].sval));
+    free((yyvsp[(2) - (3)].regval));
     ;}
     break;
 
   case 31:
 #line 135 "assembler.y"
     {
-      cout << "op: " << (yyvsp[(1) - (3)].sval) << " relative: " << (yyvsp[(2) - (3)].relval) << endl;
-      Instruction i = Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].relval));
-      instruction_list.push_back(i.instruction);
-      free((yyvsp[(1) - (3)].sval));
-      free((yyvsp[(2) - (3)].relval));
+      cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Rsrc: " << (yyvsp[(2) - (4)].regval) << endl;
+      add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].regval)));
+      free((yyvsp[(1) - (4)].sval));
+      free((yyvsp[(2) - (4)].regval));
+      free((yyvsp[(3) - (4)].regval));
     ;}
     break;
 
   case 32:
 #line 144 "assembler.y"
     {
+      cout << "op: " << (yyvsp[(1) - (4)].sval) << " Rdst: " << (yyvsp[(3) - (4)].regval) << " Imm: " << (yyvsp[(2) - (4)].immval) << endl;
+      add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].regval)));
+      free((yyvsp[(1) - (4)].sval));
+      free((yyvsp[(2) - (4)].immval));
+      free((yyvsp[(3) - (4)].regval));
+    ;}
+    break;
+
+  case 33:
+#line 153 "assembler.y"
+    {
+      cout << "op: " << (yyvsp[(1) - (3)].sval) << " relative: " << (yyvsp[(2) - (3)].relval) << endl;
+      add_instruction(Instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].relval)));
+      free((yyvsp[(1) - (3)].sval));
+      free((yyvsp[(2) - (3)].relval));
+    ;}
+    break;
+
+  case 34:
+#line 161 "assembler.y"
+    {
       cout << "R-type op: " << (yyvsp[(1) - (4)].sval) << " rel: " << (yyvsp[(2) - (4)].relval) << " reg_1: " << (yyvsp[(3) - (4)].regval) << endl;
-      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].relval), (yyvsp[(3) - (4)].regval));
-      instruction_list.push_back(i.instruction);
+      add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].relval), (yyvsp[(3) - (4)].regval)));
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].relval));
       free((yyvsp[(3) - (4)].regval));
     ;}
     break;
 
-  case 33:
-#line 154 "assembler.y"
+  case 35:
+#line 170 "assembler.y"
     {
       cout << "R-type op: " << (yyvsp[(1) - (4)].sval) << " reg: " << (yyvsp[(2) - (4)].regval) << " rel: " << (yyvsp[(3) - (4)].relval) << endl;
-      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].relval));
-      instruction_list.push_back(i.instruction);
+      add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].regval), (yyvsp[(3) - (4)].relval)));
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].regval));
       free((yyvsp[(3) - (4)].relval));
     ;}
     break;
 
-  case 34:
-#line 164 "assembler.y"
+  case 36:
+#line 179 "assembler.y"
     {
       cout << "I-type op: " << (yyvsp[(1) - (4)].sval) << " rel: " << (yyvsp[(2) - (4)].relval) << " imm: " << (yyvsp[(3) - (4)].immval) << endl;
-      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].relval), (yyvsp[(3) - (4)].immval));
-      instruction_list.push_back(i.instruction);
+      add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].relval), (yyvsp[(3) - (4)].immval)));
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].relval));
       free((yyvsp[(3) - (4)].immval));
     ;}
     break;
 
-  case 35:
-#line 174 "assembler.y"
+  case 37:
+#line 188 "assembler.y"
     {
       cout << "I-type op: " << (yyvsp[(1) - (4)].sval) << " imm: " << (yyvsp[(2) - (4)].immval) << " rel: " << (yyvsp[(3) - (4)].relval) << endl;
-      Instruction i = Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].relval));
-      instruction_list.push_back(i.instruction);
+      add_instruction(Instruction((yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].immval), (yyvsp[(3) - (4)].relval)));
       free((yyvsp[(1) - (4)].sval));
       free((yyvsp[(2) - (4)].immval));
       free((yyvsp[(3) - (4)].relval));
     ;}
     break;
 
-  case 36:
-#line 183 "assembler.y"
+  case 38:
+#line 197 "assembler.y"
     {
-              cout << "this is a label: " << (yyvsp[(1) - (2)].label) << endl;
-              free((yyvsp[(1) - (2)].label));
-            ;}
+      cout << "this is a label: " << (yyvsp[(1) - (2)].label) << endl;
+      process_label((yyvsp[(1) - (2)].label));
+      free((yyvsp[(1) - (2)].label));
+    ;}
     break;
 
-  case 38:
-#line 190 "assembler.y"
+  case 39:
+#line 204 "assembler.y"
     {
-    int i;
-    for(i = 0; i < instruction_list.size(); i++) {
-      writefile << instruction_list[i] << endl;
-    }
+      label_instruction((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].label));
+      free((yyvsp[(1) - (3)].sval));
+      free((yyvsp[(2) - (3)].label));
+    ;}
+    break;
+
+  case 41:
+#line 212 "assembler.y"
+    {
+    repair_labels();
+    write_instructions_to_file();
   ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1546 "assembler.tab.c"
+#line 1563 "assembler.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1756,12 +1773,51 @@ yyreturn:
 }
 
 
-#line 200 "assembler.y"
+#line 220 "assembler.y"
 
 
+// writes all instructions in the instruction list to the specified file
+void write_instructions_to_file() {
+  int i;
+  for(i = 0; i < instruction_list.size(); i++) {
+    writefile << instruction_list[i] << endl;
+  }
+}
+
+// fixed instructions that were written with undeclared labels
+void repair_labels() {
+  int replace_line;
+  // iterate over each instruction that needs to be fixed
+  for(auto const& it: unfilled_jumps) {
+    replace_line = it.second - 1;
+    // replace empty moves with correct label address
+    Instruction i = Instruction("MOVI", "$" + to_string(jump_table[it.first]), "R15");
+    instruction_list[replace_line] = i.instruction;
+  }
+}
+
+// processes an instruction called with a label
+void label_instruction(string op, string label) {
+  if(jump_table.find(label) != jump_table.end()) {
+    cout << "op: MOVI, imm: " + to_string(jump_table[label]) + " reg: R15"<< endl;
+    // put the address into R15
+    add_instruction(Instruction("MOVI", "$" + to_string(jump_table[label]), "R15"));
+  }
+  else {
+    // because we don't know where the label is yet we fill with zeroes
+    cout << "op: MOVI, imm: $" + to_string(0) + " reg: R15"<< endl;
+    add_instruction(Instruction("MOVI", "$0", "R15"));
+    // save this instruction to a list of instructions to be filled at EOF
+    unfilled_jumps[label] = instruction_list_index;
+  }
+
+  cout << "op: " << op << " reg: R15" << endl;
+  // branch or jump to value in R15
+  add_instruction(Instruction(op, "R15"));
+}
+
+// adds a label to the jump table
 void process_label(string label) {
-  // remove the leading .
-  label = label.substr(1, label.size());
 
   // check if label already exists, return error if dup
   if(jump_table.find(label) != jump_table.end()) {
@@ -1769,12 +1825,18 @@ void process_label(string label) {
   }
   // add to jump table
   else {
-    jump_table[label] = lineNum;
+    jump_table[label] = instruction_list_index + 1;
   }
-  cout << jump_table[label] << endl;
+}
+
+// adds an instruction to the instruction list
+void add_instruction(Instruction i) {
+  instruction_list.push_back(i.instruction);
+  instruction_list_index++;
 }
 
 int main(int argc, char *argv[]) {
+  instruction_list_index = 0;
 
   // Open a file handle to a particular file:
   if(argc == 1) {

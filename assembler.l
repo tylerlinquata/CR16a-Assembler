@@ -1,3 +1,9 @@
+/*
+ *  This file contains the flex declaration, which handles the tokenizing
+ * portion of the assmebler. Built using the Flex & Bison guide found here
+ * https://aquamentus.com/flex_bison.html#20
+ * Authors: chris@aquamentus.com, Tyler Linquata
+ */
 %{
 	#include <iostream>
 	#include "assembler.tab.h"	// to get token types from Bison
